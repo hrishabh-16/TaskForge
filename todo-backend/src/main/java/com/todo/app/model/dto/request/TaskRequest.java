@@ -21,9 +21,13 @@ public class TaskRequest {
     
     private TaskPriority priority;
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+//    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     private LocalDateTime dueDate;
 
+    private Long categoryId;
+    
+    private Long taskListId;
+    
     // Getters and Setters
     public String getTitle() {
         return title;
@@ -64,4 +68,22 @@ public class TaskRequest {
     public void setDueDate(LocalDateTime dueDate) {
         this.dueDate = dueDate;
     }
+
+	public Long getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(Long categoryId) {
+		this.categoryId = categoryId;
+	}
+
+	public Long getTaskListId() {
+		return taskListId;
+	}
+
+	public void setTaskListId(Long taskListId) {
+		this.taskListId = taskListId;
+	}
+    
+    
 }

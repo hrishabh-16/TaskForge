@@ -65,6 +65,12 @@ public class SecurityConfig {
                 // Task endpoints - require authentication
                 .requestMatchers("/api/tasks/**").authenticated()
                 
+                // Category endpoints - require authentication
+                .requestMatchers("/api/categories/**").authenticated()
+                
+                // Task List endpoints - require authentication
+                .requestMatchers("/api/task-lists/**").authenticated()
+                
                 // All other requests require authentication
                 .anyRequest().authenticated()
             );

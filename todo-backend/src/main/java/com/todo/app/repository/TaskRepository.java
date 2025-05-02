@@ -29,4 +29,25 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     
     @Query("SELECT t FROM Task t WHERE t.dueDate BETWEEN :now AND :reminder AND t.status != 'COMPLETED'")
     List<Task> findTasksForReminder(@Param("now") LocalDateTime now, @Param("reminder") LocalDateTime reminder);
+    
+    List<Task> findByUserIdAndCategoryId(Long userId, Long categoryId);
+    
+    List<Task> findByUserIdAndTaskListId(Long userId, Long taskListId);
+    
+    @Query("SELECT t FROM Task t WHERE t.user.id = :userId " +
+           "AND (:status IS NULL OR t.status = :status) " +
+           "AND (:priority IS NULL OR t.priority = :priority) " +
+           "AND (:categoryId IS NULL OR t.category.id = :categoryId) " +
+           "AND (:taskListId IS NULL OR t.taskList.id = :taskListId) " +
+           "AND (:keyword IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(t.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+           "AND (:dueDateFrom IS NULL OR t.dueDate >= :dueDateFrom) " +
+           "AND (:dueDateTo IS NULL OR t.dueDate <= :dueDateTo)")
+    List<Task> filterTasks(@Param("userId") Long userId, 
+                          @Param("status") TaskStatus status,
+                          @Param("priority") com.todo.app.model.enums.TaskPriority priority,
+                          @Param("categoryId") Long categoryId,
+                          @Param("taskListId") Long taskListId,
+                          @Param("keyword") String keyword,
+                          @Param("dueDateFrom") LocalDateTime dueDateFrom,
+                          @Param("dueDateTo") LocalDateTime dueDateTo);
 }

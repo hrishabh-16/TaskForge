@@ -16,14 +16,19 @@ public class TaskResponse {
     private String dueDate;
     private Long userId;
     private String username;
+    private Long categoryId;
+    private String categoryName;
+    private Long taskListId;
+    private String taskListName;
     private String createdAt;
     private String updatedAt;
     private String completedAt;
 
     public TaskResponse(Long id, String title, String description, TaskStatus status, 
                        TaskPriority priority, LocalDateTime dueDate, Long userId, 
-                       String username, LocalDateTime createdAt, LocalDateTime updatedAt, 
-                       LocalDateTime completedAt) {
+                       String username, Long categoryId, String categoryName,
+                       Long taskListId, String taskListName, LocalDateTime createdAt, 
+                       LocalDateTime updatedAt, LocalDateTime completedAt) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -32,6 +37,10 @@ public class TaskResponse {
         this.dueDate = formatDateTime(dueDate);
         this.userId = userId;
         this.username = username;
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
+        this.taskListId = taskListId;
+        this.taskListName = taskListName;
         this.createdAt = formatDateTime(createdAt);
         this.updatedAt = formatDateTime(updatedAt);
         this.completedAt = formatDateTime(completedAt);
@@ -42,7 +51,7 @@ public class TaskResponse {
         return dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
-    // Getters and Setters
+    // Getters and Setters for all fields
     public Long getId() {
         return id;
     }
@@ -105,6 +114,38 @@ public class TaskResponse {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public Long getTaskListId() {
+        return taskListId;
+    }
+
+    public void setTaskListId(Long taskListId) {
+        this.taskListId = taskListId;
+    }
+
+    public String getTaskListName() {
+        return taskListName;
+    }
+
+    public void setTaskListName(String taskListName) {
+        this.taskListName = taskListName;
     }
 
     public String getCreatedAt() {
