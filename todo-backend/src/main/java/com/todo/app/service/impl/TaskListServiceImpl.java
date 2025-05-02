@@ -1,5 +1,6 @@
 package com.todo.app.service.impl;
 
+import com.todo.app.mapper.TaskListMapper;
 import com.todo.app.model.dto.request.TaskListRequest;
 import com.todo.app.model.dto.response.TaskListResponse;
 import com.todo.app.model.entity.TaskList;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -25,6 +25,9 @@ public class TaskListServiceImpl implements TaskListService {
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private TaskListMapper taskListMapper;
 
     @Override
     public TaskListResponse createTaskList(TaskListRequest taskListRequest) {
@@ -34,13 +37,9 @@ public class TaskListServiceImpl implements TaskListService {
             throw new RuntimeException("Task list with this name already exists");
         }
         
-        TaskList taskList = new TaskList();
-        taskList.setName(taskListRequest.getName());
-        taskList.setDescription(taskListRequest.getDescription());
-        taskList.setUser(currentUser);
-        
+        TaskList taskList = taskListMapper.toTaskList(taskListRequest, currentUser);
         taskList = taskListRepository.save(taskList);
-        return mapToTaskListResponse(taskList);
+        return taskListMapper.toTaskListResponse(taskList);
     }
 
     @Override
@@ -54,11 +53,9 @@ public class TaskListServiceImpl implements TaskListService {
             throw new RuntimeException("Task list with this name already exists");
         }
         
-        taskList.setName(taskListRequest.getName());
-        taskList.setDescription(taskListRequest.getDescription());
-        
+        taskListMapper.updateTaskListFromRequest(taskList, taskListRequest);
         taskList = taskListRepository.save(taskList);
-        return mapToTaskListResponse(taskList);
+        return taskListMapper.toTaskListResponse(taskList);
     }
 
     @Override
@@ -67,16 +64,14 @@ public class TaskListServiceImpl implements TaskListService {
         TaskList taskList = taskListRepository.findByIdAndUserId(taskListId, currentUser.getId())
                 .orElseThrow(() -> new RuntimeException("Task list not found or access denied"));
         
-        return mapToTaskListResponse(taskList);
+        return taskListMapper.toTaskListResponse(taskList);
     }
 
     @Override
     public List<TaskListResponse> getAllTaskListsForCurrentUser() {
         User currentUser = getCurrentUser();
         List<TaskList> taskLists = taskListRepository.findByUserIdOrderByNameAsc(currentUser.getId());
-        return taskLists.stream()
-                .map(this::mapToTaskListResponse)
-                .collect(Collectors.toList());
+        return taskListMapper.toTaskListResponseList(taskLists);
     }
 
     @Override
@@ -84,9 +79,7 @@ public class TaskListServiceImpl implements TaskListService {
         User currentUser = getCurrentUser();
         List<TaskList> taskLists = taskListRepository.findByUserIdAndNameContainingIgnoreCase(
                 currentUser.getId(), keyword);
-        return taskLists.stream()
-                .map(this::mapToTaskListResponse)
-                .collect(Collectors.toList());
+        return taskListMapper.toTaskListResponseList(taskLists);
     }
 
     @Override
@@ -107,17 +100,5 @@ public class TaskListServiceImpl implements TaskListService {
         String username = authentication.getName();
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Current user not found"));
-    }
-
-    private TaskListResponse mapToTaskListResponse(TaskList taskList) {
-        return new TaskListResponse(
-                taskList.getId(),
-                taskList.getName(),
-                taskList.getDescription(),
-                taskList.getUser().getId(),
-                taskList.getTasks().size(),
-                taskList.getCreatedAt(),
-                taskList.getUpdatedAt()
-        );
     }
 }

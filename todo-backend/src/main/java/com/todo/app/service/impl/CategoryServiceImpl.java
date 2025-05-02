@@ -1,5 +1,6 @@
 package com.todo.app.service.impl;
 
+import com.todo.app.mapper.CategoryMapper;
 import com.todo.app.model.dto.request.CategoryRequest;
 import com.todo.app.model.dto.response.CategoryResponse;
 import com.todo.app.model.entity.Category;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -25,6 +25,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private CategoryMapper categoryMapper;
 
     @Override
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
@@ -34,14 +37,9 @@ public class CategoryServiceImpl implements CategoryService {
             throw new RuntimeException("Category with this name already exists");
         }
         
-        Category category = new Category();
-        category.setName(categoryRequest.getName());
-        category.setDescription(categoryRequest.getDescription());
-        category.setColor(categoryRequest.getColor());
-        category.setUser(currentUser);
-        
+        Category category = categoryMapper.toCategory(categoryRequest, currentUser);
         category = categoryRepository.save(category);
-        return mapToCategoryResponse(category);
+        return categoryMapper.toCategoryResponse(category);
     }
 
     @Override
@@ -55,12 +53,9 @@ public class CategoryServiceImpl implements CategoryService {
             throw new RuntimeException("Category with this name already exists");
         }
         
-        category.setName(categoryRequest.getName());
-        category.setDescription(categoryRequest.getDescription());
-        category.setColor(categoryRequest.getColor());
-        
+        categoryMapper.updateCategoryFromRequest(category, categoryRequest);
         category = categoryRepository.save(category);
-        return mapToCategoryResponse(category);
+        return categoryMapper.toCategoryResponse(category);
     }
 
     @Override
@@ -69,16 +64,14 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findByIdAndUserId(categoryId, currentUser.getId())
                 .orElseThrow(() -> new RuntimeException("Category not found or access denied"));
         
-        return mapToCategoryResponse(category);
+        return categoryMapper.toCategoryResponse(category);
     }
 
     @Override
     public List<CategoryResponse> getAllCategoriesForCurrentUser() {
         User currentUser = getCurrentUser();
         List<Category> categories = categoryRepository.findByUserIdOrderByNameAsc(currentUser.getId());
-        return categories.stream()
-                .map(this::mapToCategoryResponse)
-                .collect(Collectors.toList());
+        return categoryMapper.toCategoryResponseList(categories);
     }
 
     @Override
@@ -86,9 +79,7 @@ public class CategoryServiceImpl implements CategoryService {
         User currentUser = getCurrentUser();
         List<Category> categories = categoryRepository.findByUserIdAndNameContainingIgnoreCase(
                 currentUser.getId(), keyword);
-        return categories.stream()
-                .map(this::mapToCategoryResponse)
-                .collect(Collectors.toList());
+        return categoryMapper.toCategoryResponseList(categories);
     }
 
     @Override
@@ -109,18 +100,5 @@ public class CategoryServiceImpl implements CategoryService {
         String username = authentication.getName();
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Current user not found"));
-    }
-
-    private CategoryResponse mapToCategoryResponse(Category category) {
-        return new CategoryResponse(
-                category.getId(),
-                category.getName(),
-                category.getDescription(),
-                category.getColor(),
-                category.getUser().getId(),
-                category.getTasks().size(),
-                category.getCreatedAt(),
-                category.getUpdatedAt()
-        );
     }
 }
