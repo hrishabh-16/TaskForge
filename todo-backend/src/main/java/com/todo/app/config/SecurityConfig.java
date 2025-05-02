@@ -51,28 +51,34 @@ public class SecurityConfig {
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Public endpoints
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/test/**").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers("/error").permitAll()
-                
-                // User endpoints - require authentication
-                .requestMatchers("/api/users/me").authenticated()
-                .requestMatchers("/api/users").hasRole("ADMIN")
-                .requestMatchers("/api/users/**").authenticated()
-                
-                // Task endpoints - require authentication
-                .requestMatchers("/api/tasks/**").authenticated()
-                
-                // Category endpoints - require authentication
-                .requestMatchers("/api/categories/**").authenticated()
-                
-                // Task List endpoints - require authentication
-                .requestMatchers("/api/task-lists/**").authenticated()
-                
-                // All other requests require authentication
-                .anyRequest().authenticated()
+            		 // Public endpoints
+                    .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/api/test/**").permitAll()
+                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                    .requestMatchers("/error").permitAll()
+                    
+                    // User endpoints - require authentication
+                    .requestMatchers("/api/users/me").authenticated()
+                    .requestMatchers("/api/users").hasRole("ADMIN")
+                    .requestMatchers("/api/users/**").authenticated()
+                    
+                    // Task endpoints - require authentication
+                    .requestMatchers("/api/tasks/**").authenticated()
+                    
+                    // Category endpoints - require authentication
+                    .requestMatchers("/api/categories/**").authenticated()
+                    
+                    // Task List endpoints - require authentication
+                    .requestMatchers("/api/task-lists/**").authenticated()
+                    
+                    // Comment endpoints - require authentication
+                    .requestMatchers("/api/comments/**").authenticated()
+                    
+                    // Attachment endpoints - require authentication
+                    .requestMatchers("/api/attachments/**").authenticated()
+                    
+                    // All other requests require authentication
+                    .anyRequest().authenticated()
             );
         
         http.authenticationProvider(authenticationProvider());

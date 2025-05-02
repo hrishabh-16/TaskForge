@@ -78,6 +78,8 @@ public class TaskMapper {
                 task.getCategory() != null ? task.getCategory().getName() : null,
                 task.getTaskList() != null ? task.getTaskList().getId() : null,
                 task.getTaskList() != null ? task.getTaskList().getName() : null,
+                task.getComments() != null ? task.getComments().size() : 0,
+                task.getAttachments() != null ? task.getAttachments().size() : 0,
                 task.getCreatedAt(),
                 task.getUpdatedAt(),
                 task.getCompletedAt()

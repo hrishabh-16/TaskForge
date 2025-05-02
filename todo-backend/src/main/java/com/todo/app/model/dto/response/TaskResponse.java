@@ -20,6 +20,8 @@ public class TaskResponse {
     private String categoryName;
     private Long taskListId;
     private String taskListName;
+    private Integer commentCount;
+    private Integer attachmentCount;
     private String createdAt;
     private String updatedAt;
     private String completedAt;
@@ -27,7 +29,8 @@ public class TaskResponse {
     public TaskResponse(Long id, String title, String description, TaskStatus status, 
                        TaskPriority priority, LocalDateTime dueDate, Long userId, 
                        String username, Long categoryId, String categoryName,
-                       Long taskListId, String taskListName, LocalDateTime createdAt, 
+                       Long taskListId, String taskListName, Integer commentCount,
+                       Integer attachmentCount, LocalDateTime createdAt, 
                        LocalDateTime updatedAt, LocalDateTime completedAt) {
         this.id = id;
         this.title = title;
@@ -41,6 +44,8 @@ public class TaskResponse {
         this.categoryName = categoryName;
         this.taskListId = taskListId;
         this.taskListName = taskListName;
+        this.commentCount = commentCount;
+        this.attachmentCount = attachmentCount;
         this.createdAt = formatDateTime(createdAt);
         this.updatedAt = formatDateTime(updatedAt);
         this.completedAt = formatDateTime(completedAt);
@@ -51,124 +56,142 @@ public class TaskResponse {
         return dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
-    // Getters and Setters for all fields
-    public Long getId() {
-        return id;
+    // Add getters and setters for the new fields
+    public Integer getCommentCount() {
+        return commentCount;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setCommentCount(Integer commentCount) {
+        this.commentCount = commentCount;
     }
 
-    public String getTitle() {
-        return title;
+    public Integer getAttachmentCount() {
+        return attachmentCount;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setAttachmentCount(Integer attachmentCount) {
+        this.attachmentCount = attachmentCount;
     }
 
-    public String getDescription() {
-        return description;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public TaskStatus getStatus() {
-        return status;
-    }
+	public String getTitle() {
+		return title;
+	}
 
-    public void setStatus(TaskStatus status) {
-        this.status = status;
-    }
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
-    public TaskPriority getPriority() {
-        return priority;
-    }
+	public String getDescription() {
+		return description;
+	}
 
-    public void setPriority(TaskPriority priority) {
-        this.priority = priority;
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public String getDueDate() {
-        return dueDate;
-    }
+	public TaskStatus getStatus() {
+		return status;
+	}
 
-    public void setDueDate(String dueDate) {
-        this.dueDate = dueDate;
-    }
+	public void setStatus(TaskStatus status) {
+		this.status = status;
+	}
 
-    public Long getUserId() {
-        return userId;
-    }
+	public TaskPriority getPriority() {
+		return priority;
+	}
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+	public void setPriority(TaskPriority priority) {
+		this.priority = priority;
+	}
 
-    public String getUsername() {
-        return username;
-    }
+	public String getDueDate() {
+		return dueDate;
+	}
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+	public void setDueDate(String dueDate) {
+		this.dueDate = dueDate;
+	}
 
-    public Long getCategoryId() {
-        return categoryId;
-    }
+	public Long getUserId() {
+		return userId;
+	}
 
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
-    }
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 
-    public String getCategoryName() {
-        return categoryName;
-    }
+	public String getUsername() {
+		return username;
+	}
 
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
+	public void setUsername(String username) {
+		this.username = username;
+	}
 
-    public Long getTaskListId() {
-        return taskListId;
-    }
+	public Long getCategoryId() {
+		return categoryId;
+	}
 
-    public void setTaskListId(Long taskListId) {
-        this.taskListId = taskListId;
-    }
+	public void setCategoryId(Long categoryId) {
+		this.categoryId = categoryId;
+	}
 
-    public String getTaskListName() {
-        return taskListName;
-    }
+	public String getCategoryName() {
+		return categoryName;
+	}
 
-    public void setTaskListName(String taskListName) {
-        this.taskListName = taskListName;
-    }
+	public void setCategoryName(String categoryName) {
+		this.categoryName = categoryName;
+	}
 
-    public String getCreatedAt() {
-        return createdAt;
-    }
+	public Long getTaskListId() {
+		return taskListId;
+	}
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
+	public void setTaskListId(Long taskListId) {
+		this.taskListId = taskListId;
+	}
 
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
+	public String getTaskListName() {
+		return taskListName;
+	}
 
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+	public void setTaskListName(String taskListName) {
+		this.taskListName = taskListName;
+	}
 
-    public String getCompletedAt() {
-        return completedAt;
-    }
+	public String getCreatedAt() {
+		return createdAt;
+	}
 
-    public void setCompletedAt(String completedAt) {
-        this.completedAt = completedAt;
-    }
+	public void setCreatedAt(String createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public String getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(String updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
+	public String getCompletedAt() {
+		return completedAt;
+	}
+
+	public void setCompletedAt(String completedAt) {
+		this.completedAt = completedAt;
+	}
+
+
 }
