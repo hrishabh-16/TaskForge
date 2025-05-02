@@ -44,6 +44,9 @@ public class User {
     private Set<Role> roles = new HashSet<>();
 
     private boolean enabled = false;
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Task> tasks = new HashSet<>();	
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -116,6 +119,14 @@ public class User {
 
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+
+	public Set<Task> getTasks() {
+		return tasks;
+	}
+
+	public void setTasks(Set<Task> tasks) {
+		this.tasks = tasks;
 	}
     
     

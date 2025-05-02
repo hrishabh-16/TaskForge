@@ -3,7 +3,6 @@ package com.todo.app.config;
 import com.todo.app.security.jwt.JwtAuthenticationEntryPoint;
 import com.todo.app.security.jwt.JwtAuthenticationFilter;
 import com.todo.app.security.service.UserDetailsServiceImpl;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +22,6 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-
 public class SecurityConfig {
     
     @Autowired
@@ -53,13 +51,21 @@ public class SecurityConfig {
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                // Public endpoints
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/test/**").permitAll()
-                .requestMatchers("/api/users/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/error").permitAll()
+                
+                // User endpoints - require authentication
+                .requestMatchers("/api/users/me").authenticated()
                 .requestMatchers("/api/users").hasRole("ADMIN")
                 .requestMatchers("/api/users/**").authenticated()
+                
+                // Task endpoints - require authentication
+                .requestMatchers("/api/tasks/**").authenticated()
+                
+                // All other requests require authentication
                 .anyRequest().authenticated()
             );
         
