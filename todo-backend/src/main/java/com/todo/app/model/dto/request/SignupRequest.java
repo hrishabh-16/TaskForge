@@ -1,6 +1,7 @@
 package com.todo.app.model.dto.request;
 
-import jakarta.validation.constraints.Email;
+import com.todo.app.validation.annotation.PasswordMatch;
+import com.todo.app.validation.annotation.ValidEmail;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@PasswordMatch
 public class SignupRequest {
     @NotBlank
     @Size(min = 3, max = 50)
@@ -19,14 +21,26 @@ public class SignupRequest {
 
     @NotBlank
     @Size(max = 100)
-    @Email
+    @ValidEmail
     private String email;
 
     @NotBlank
     @Size(min = 6, max = 40)
     private String password;
+    
+    @NotBlank
+    private String confirmPassword;
 
     private Set<String> roles;
+
+
+	public String getConfirmPassword() {
+		return confirmPassword;
+	}
+
+	public void setConfirmPassword(String confirmPassword) {
+		this.confirmPassword = confirmPassword;
+	}
 
 	public String getUsername() {
 		return username;

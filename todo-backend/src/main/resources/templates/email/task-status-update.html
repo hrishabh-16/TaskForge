@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Status Updated</title>
+</head>
+<body>
+    <p>Hello <span th:text="${userName}">User</span>,</p>
+    
+    <p>The status of your task "<strong th:text="${task.title}">Task Title</strong>" has been updated to <strong th:text="${status}">Status</strong>.</p>
+    
+    <p>Task Details:</p>
+    <ul>
+        <li>Title: <span th:text="${task.title}">Task Title</span></li>
+        <li>Description: <span th:text="${task.description}">Task Description</span></li>
+        <li>Priority: <span th:text="${task.priority}">Priority</span></li>
+        <li>Current Status: <span th:text="${task.status}">Status</span></li>
+    </ul>
+    
+    <p>Best regards,<br>Todo App Team</p>
+</body>
+</html>

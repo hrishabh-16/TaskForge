@@ -4,12 +4,15 @@ import com.todo.app.model.dto.request.TaskRequest;
 import com.todo.app.model.dto.response.TaskResponse;
 import com.todo.app.model.entity.Task;
 import com.todo.app.model.entity.User;
+import com.todo.app.model.enums.NotificationType;
 import com.todo.app.model.enums.TaskStatus;
 import com.todo.app.exception.ResourceNotFoundException;
 import com.todo.app.exception.UnauthorizedException;
 import com.todo.app.mapper.TaskMapper;
 import com.todo.app.repository.TaskRepository;
 import com.todo.app.repository.UserRepository;
+import com.todo.app.service.interfaces.EmailService;
+import com.todo.app.service.interfaces.NotificationService;
 import com.todo.app.service.interfaces.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -32,6 +35,12 @@ public class TaskServiceImpl implements TaskService {
 
     @Autowired
     private TaskMapper taskMapper;
+    
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public TaskResponse createTask(TaskRequest taskRequest) {
@@ -44,23 +53,36 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskResponse updateTask(Long taskId, TaskRequest taskRequest) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
-
+                .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
         
-        // Verify that the task belongs to the current user
         User currentUser = getCurrentUser();
         if (!task.getUser().getId().equals(currentUser.getId())) {
-        	throw new UnauthorizedException("You don't have permission to update this task");
+            throw new RuntimeException("You don't have permission to update this task");
         }
 
+        // Check if status is changing
+        boolean statusChanged = taskRequest.getStatus() != null && !taskRequest.getStatus().equals(task.getStatus());
+        
         taskMapper.updateTaskFromRequest(task, taskRequest);
         
-        // If task is being marked as completed, set the completed date
         if (TaskStatus.COMPLETED.equals(taskRequest.getStatus()) && !TaskStatus.COMPLETED.equals(task.getStatus())) {
             task.setCompletedAt(LocalDateTime.now());
         }
         
         task = taskRepository.save(task);
+        
+        // Send notification if status changed
+        if (statusChanged) {
+            emailService.sendTaskStatusUpdateEmail(task);
+            notificationService.createNotification(
+                task.getUser(),
+                "Task Status Updated",
+                "Your task '" + task.getTitle() + "' status has been updated to " + task.getStatus(),
+                NotificationType.TASK_STATUS_UPDATED,
+                task
+            );
+        }
+        
         return taskMapper.toTaskResponse(task);
     }
 

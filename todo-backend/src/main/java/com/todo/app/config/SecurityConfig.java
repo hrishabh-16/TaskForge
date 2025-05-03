@@ -77,6 +77,9 @@ public class SecurityConfig {
                     // Attachment endpoints - require authentication
                     .requestMatchers("/api/attachments/**").authenticated()
                     
+                    //Notification endpoints - require authentication
+                    .requestMatchers("/api/notifications/**").authenticated()
+                    
                     // All other requests require authentication
                     .anyRequest().authenticated()
             );

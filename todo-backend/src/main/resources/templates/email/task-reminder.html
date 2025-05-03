@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Reminder</title>
+</head>
+<body>
+    <p>Hello <span th:text="${userName}">User</span>,</p>
+    
+    <p>This is a reminder that your task "<strong th:text="${task.title}">Task Title</strong>" is due on <strong th:text="${dueDate}">Due Date</strong>.</p>
+    
+    <p>Task Details:</p>
+    <ul>
+        <li>Title: <span th:text="${task.title}">Task Title</span></li>
+        <li>Description: <span th:text="${task.description}">Task Description</span></li>
+        <li>Priority: <span th:text="${task.priority}">Priority</span></li>
+        <li>Status: <span th:text="${task.status}">Status</span></li>
+    </ul>
+    
+    <p>Please complete the task before the due date.</p>
+    
+    <p>Best regards,<br>Todo App Team</p>
+</body>
+</html>
