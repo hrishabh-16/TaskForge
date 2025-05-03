@@ -32,8 +32,8 @@ public class TaskReminderScheduler {
     @Value("${app.task.reminder.hours-before}")
     private int hoursBeforeReminder;
 
-    // Run every minute
-    @Scheduled(cron = "0 * * * * ?")
+    // Run every 30 minutes
+    @Scheduled(cron = "0 */30 * * * ?")
     public void sendTaskReminders() {
         logger.info("Starting task reminder job");
         
