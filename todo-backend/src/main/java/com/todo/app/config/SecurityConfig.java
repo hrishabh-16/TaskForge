@@ -80,6 +80,9 @@ public class SecurityConfig {
                     //Notification endpoints - require authentication
                     .requestMatchers("/api/notifications/**").authenticated()
                     
+                 // Inside the filterChain method, add this line to the authorizeHttpRequests section:
+                    .requestMatchers("/api/auth/forgot-password", "/api/auth/reset-password").permitAll()
+                    
                     // All other requests require authentication
                     .anyRequest().authenticated()
             );

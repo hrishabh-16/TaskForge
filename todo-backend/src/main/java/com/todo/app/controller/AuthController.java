@@ -1,11 +1,19 @@
 package com.todo.app.controller;
 
+import com.todo.app.model.dto.request.ForgotPasswordRequest;
 import com.todo.app.model.dto.request.LoginRequest;
+import com.todo.app.model.dto.request.PasswordResetRequest;
 import com.todo.app.model.dto.request.SignupRequest;
 import com.todo.app.model.dto.response.JwtResponse;
 import com.todo.app.service.interfaces.AuthService;
+import com.todo.app.service.interfaces.PasswordResetService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +30,9 @@ public class AuthController {
     
     @Autowired
     private AuthService authService;
+    
+    @Autowired
+    private PasswordResetService passwordResetService;
     
     @PostMapping(value = "/signin", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -40,4 +51,5 @@ public class AuthController {
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
         return authService.registerUser(signupRequest);
     }
+    
 }
