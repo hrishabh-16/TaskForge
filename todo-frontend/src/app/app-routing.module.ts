@@ -12,7 +12,6 @@ import { TaskListListComponent } from './features/task-lists/components/task-lis
 import { TaskListFormComponent } from './features/task-lists/components/task-list-form/task-list-form.component';
 import { CategoryListComponent } from './features/categories/components/category-list/category-list.component';
 import { CategoryFormComponent } from './features/categories/components/category-form/category-form.component';
-
 import { AuthGuard } from './core/auth/guards/auth.guard';
 
 const routes: Routes = [
@@ -23,16 +22,15 @@ const routes: Routes = [
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
 
+   // Task View Routes (MUST BE BEFORE the :id routes)
+   { path: 'tasks/today', component: TaskListComponent, canActivate: [AuthGuard] },
+   { path: 'tasks/upcoming', component: TaskListComponent, canActivate: [AuthGuard] },
+   { path: 'tasks/completed', component: TaskListComponent, canActivate: [AuthGuard] },
+   { path: 'tasks/overdue', component: TaskListComponent, canActivate: [AuthGuard] },
+
   // Task Routes
   { path: 'tasks', component: TaskListComponent, canActivate: [AuthGuard] },
   { path: 'tasks/new', component: TaskFormComponent, canActivate: [AuthGuard] },
-  
-  // Task View Routes (MUST BE BEFORE the :id routes)
-  { path: 'tasks/today', component: TaskListComponent, canActivate: [AuthGuard] },
-  { path: 'tasks/upcoming', component: TaskListComponent, canActivate: [AuthGuard] },
-  { path: 'tasks/completed', component: TaskListComponent, canActivate: [AuthGuard] },
-  { path: 'tasks/overdue', component: TaskListComponent, canActivate: [AuthGuard] },
-  
   // These routes must be AFTER the specific named routes above
   { path: 'tasks/:id', component: TaskDetailComponent, canActivate: [AuthGuard] },
   { path: 'tasks/:id/edit', component: TaskFormComponent, canActivate: [AuthGuard] },

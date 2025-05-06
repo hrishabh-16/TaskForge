@@ -1,7 +1,9 @@
+// src/app/features/tasks/components/task-list/task-list.component.ts
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TaskService } from '../../services/task.service';
 import { TaskListService } from '../../../task-lists/services/task-list.service';
+import { CategoryService } from '../../../categories/services/category.service';
 import { Task } from '../../models/task.model';
 import { catchError, finalize, of } from 'rxjs';
 
@@ -42,51 +44,68 @@ export class TaskListComponent implements OnInit {
   constructor(
     private taskService: TaskService,
     private taskListService: TaskListService,
+    private categoryService: CategoryService,
     private route: ActivatedRoute,
     private router: Router
   ) { }
 
   ngOnInit(): void {
-    this.route.url.subscribe(segments => {
-      // Reset viewMode to default
-      this.viewMode = 'all';
-      this.taskListId = null;
-      this.categoryId = null;
-      
-      if (segments.length > 0) {
-        // Check for special view modes
-        if (['today', 'upcoming', 'completed', 'overdue'].includes(segments[0].path)) {
-          this.viewMode = segments[0].path;
-          this.loadTasksByMode(this.viewMode);
-        } else if (segments[0].path === 'task-lists' && segments.length > 1) {
-          // The route format is /task-lists/:id
-          const id = segments[1].path;
-          if (id && !isNaN(+id)) {
-            this.taskListId = +id;
-            this.loadTasksByList(this.taskListId);
-          } else {
-            this.error = 'Invalid task list ID';
-            this.isLoading = false;
-          }
-        } else if (segments[0].path === 'categories' && segments.length > 1) {
-          // The route format is /categories/:id
-          const id = segments[1].path;
-          if (id && !isNaN(+id)) {
-            this.categoryId = +id;
-            this.loadTasksByCategory(this.categoryId);
-          } else {
-            this.error = 'Invalid category ID';
-            this.isLoading = false;
-          }
-        } else {
-          // Default view for /tasks
-          this.loadAllTasks();
-        }
+    this.determineViewModeAndLoadTasks();
+  }
+
+  determineViewModeAndLoadTasks(): void {
+    // Reset viewMode to default
+    this.viewMode = 'all';
+    this.taskListId = null;
+    this.taskListName = null;
+    this.categoryId = null;
+    this.categoryName = null;
+    
+    // Check for route path to determine view mode
+    const url = this.router.url;
+    
+    if (url.includes('/tasks/today')) {
+      this.viewMode = 'today';
+      this.loadTasksByMode('today');
+    } 
+    else if (url.includes('/tasks/upcoming')) {
+      this.viewMode = 'upcoming';
+      this.loadTasksByMode('upcoming');
+    } 
+    else if (url.includes('/tasks/completed')) {
+      this.viewMode = 'completed';
+      this.loadTasksByMode('completed');
+    } 
+    else if (url.includes('/tasks/overdue')) {
+      this.viewMode = 'overdue';
+      this.loadTasksByMode('overdue');
+    } 
+    else if (url.includes('/task-lists/')) {
+      // Extract ID from URL for task list view
+      const id = this.route.snapshot.paramMap.get('id');
+      if (id && !isNaN(+id)) {
+        this.taskListId = +id;
+        this.loadTasksByList(this.taskListId);
       } else {
-        // Default view for /tasks
-        this.loadAllTasks();
+        this.error = 'Invalid task list ID';
+        this.isLoading = false;
       }
-    });
+    } 
+    else if (url.includes('/categories/')) {
+      // Extract ID from URL for category view
+      const id = this.route.snapshot.paramMap.get('id');
+      if (id && !isNaN(+id)) {
+        this.categoryId = +id;
+        this.loadTasksByCategory(this.categoryId);
+      } else {
+        this.error = 'Invalid category ID';
+        this.isLoading = false;
+      }
+    } 
+    else {
+      // Default view for /tasks
+      this.loadAllTasks();
+    }
     
     // Also check for query params (in case navigation was done with query params)
     this.route.queryParams.subscribe(params => {
@@ -137,7 +156,7 @@ export class TaskListComponent implements OnInit {
           this.taskListName = taskList.name;
           
           // Then load the tasks for this list
-          this.taskService.getTasks({ taskListId: listId })
+          this.taskService.getTasks()
             .pipe(
               catchError(err => {
                 this.error = err.message || `Failed to load tasks for list ${listId}`;
@@ -148,7 +167,8 @@ export class TaskListComponent implements OnInit {
               })
             )
             .subscribe(tasks => {
-              this.tasks = tasks;
+              // Filter tasks for this task list ID
+              this.tasks = tasks.filter(task => task.taskListId === listId);
               this.applyFilters();
             });
         } else {
@@ -161,22 +181,37 @@ export class TaskListComponent implements OnInit {
     this.isLoading = true;
     this.error = '';
     
-    this.taskService.getTasks({ categoryId })
+    // First, get the category details to show the name
+    this.categoryService.getCategory(categoryId)
       .pipe(
         catchError(err => {
-          this.error = err.message || `Failed to load tasks for category ${categoryId}`;
-          return of([]);
-        }),
-        finalize(() => {
-          this.isLoading = false;
+          this.error = err.message || `Failed to load category details`;
+          return of(null);
         })
       )
-      .subscribe(tasks => {
-        this.tasks = tasks;
-        if (tasks.length > 0 && tasks[0].categoryName) {
-          this.categoryName = tasks[0].categoryName;
+      .subscribe(category => {
+        if (category) {
+          this.categoryName = category.name;
+          
+          // Then load the tasks for this category
+          this.taskService.getTasks()
+            .pipe(
+              catchError(err => {
+                this.error = err.message || `Failed to load tasks for category ${categoryId}`;
+                return of([]);
+              }),
+              finalize(() => {
+                this.isLoading = false;
+              })
+            )
+            .subscribe(tasks => {
+              // Filter tasks for this category ID
+              this.tasks = tasks.filter(task => task.categoryId === categoryId);
+              this.applyFilters();
+            });
+        } else {
+          this.isLoading = false;
         }
-        this.applyFilters();
       });
   }
   
@@ -184,52 +219,8 @@ export class TaskListComponent implements OnInit {
     this.isLoading = true;
     this.error = '';
     
-    let observable;
-    
-    switch (mode) {
-      case 'today':
-        // Fetch tasks due today
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        
-        observable = this.taskService.getTasks({
-          dueDateFrom: today.toISOString(),
-          dueDateTo: tomorrow.toISOString(),
-          status: 'PENDING'
-        });
-        break;
-        
-      case 'upcoming':
-        // Fetch tasks due in the next 7 days
-        const startDate = new Date();
-        startDate.setHours(0, 0, 0, 0);
-        const endDate = new Date(startDate);
-        endDate.setDate(endDate.getDate() + 7);
-        
-        observable = this.taskService.getTasks({
-          dueDateFrom: startDate.toISOString(),
-          dueDateTo: endDate.toISOString(),
-          status: 'PENDING'
-        });
-        break;
-        
-      case 'completed':
-        // Fetch completed tasks
-        observable = this.taskService.getTasksByStatus('COMPLETED');
-        break;
-        
-      case 'overdue':
-        // Fetch overdue tasks
-        observable = this.taskService.getOverdueTasks();
-        break;
-        
-      default:
-        observable = this.taskService.getTasks();
-    }
-    
-    observable
+    // Get all tasks first, then filter them based on the mode
+    this.taskService.getTasks()
       .pipe(
         catchError(err => {
           this.error = err.message || `Failed to load ${mode} tasks`;
@@ -240,7 +231,66 @@ export class TaskListComponent implements OnInit {
         })
       )
       .subscribe(tasks => {
-        this.tasks = tasks;
+        // Apply specific filtering based on mode
+        switch (mode) {
+          case 'today':
+            // Filter tasks due today
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            this.tasks = tasks.filter(task => {
+              if (task.dueDate && task.status !== 'COMPLETED') {
+                const dueDate = new Date(task.dueDate);
+                return dueDate >= today && dueDate < tomorrow;
+              }
+              return false;
+            });
+            break;
+            
+          case 'upcoming':
+            // Filter tasks due in the next 7 days (excluding today)
+            const startDate = new Date();
+            startDate.setHours(0, 0, 0, 0);
+            const nextDay = new Date(startDate);
+            nextDay.setDate(nextDay.getDate() + 1);
+            const endDate = new Date(startDate);
+            endDate.setDate(endDate.getDate() + 7);
+            
+            this.tasks = tasks.filter(task => {
+              if (task.dueDate && task.status !== 'COMPLETED') {
+                const dueDate = new Date(task.dueDate);
+                return dueDate >= nextDay && dueDate <= endDate;
+              }
+              return false;
+            });
+            break;
+            
+          case 'completed':
+            // Filter completed tasks
+            this.tasks = tasks.filter(task => task.status === 'COMPLETED');
+            break;
+            
+          case 'overdue':
+            // Filter overdue tasks
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            
+            this.tasks = tasks.filter(task => {
+              if (task.dueDate && task.status !== 'COMPLETED') {
+                const dueDate = new Date(task.dueDate);
+                dueDate.setHours(0, 0, 0, 0);
+                return dueDate < now;
+              }
+              return false;
+            });
+            break;
+            
+          default:
+            this.tasks = tasks;
+        }
+        
         this.applyFilters();
       });
   }
@@ -315,6 +365,7 @@ export class TaskListComponent implements OnInit {
     this.filteredTasks = filtered;
   }
   
+  // Rest of the component methods remain unchanged
   setStatusFilter(status: string | null): void {
     this.statusFilter = status;
     this.applyFilters();
