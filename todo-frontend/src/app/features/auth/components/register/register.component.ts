@@ -1,12 +1,13 @@
+// src/app/features/auth/components/register/register.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { first } from 'rxjs/operators';
-import { AuthService } from   '../../../../core/auth/services/auth.service';
+import { AuthService } from '../../../../core/auth/services/auth.service';
 
 @Component({
   selector: 'app-register',
-  standalone: false,
+  standalone: false,  
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
@@ -16,6 +17,7 @@ export class RegisterComponent implements OnInit {
   submitted = false;
   error = '';
   success = '';
+  showToast = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -33,9 +35,10 @@ export class RegisterComponent implements OnInit {
       username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', Validators.required]
+      confirmPassword: ['', Validators.required],
+      terms: [false, Validators.requiredTrue]
     }, {
-      validator: this.passwordMatchValidator
+      validators: this.passwordMatchValidator
     });
   }
 
@@ -43,7 +46,12 @@ export class RegisterComponent implements OnInit {
   passwordMatchValidator(form: FormGroup) {
     const password = form.get('password')?.value;
     const confirmPassword = form.get('confirmPassword')?.value;
-    return password === confirmPassword ? null : { passwordMismatch: true };
+    
+    if (password === confirmPassword) {
+      return null;
+    }
+    
+    return { passwordMismatch: true };
   }
 
   // Getter for easy access to form fields
@@ -51,12 +59,14 @@ export class RegisterComponent implements OnInit {
 
   onSubmit() {
     this.submitted = true;
-
-    // Stop here if form is invalid
+    this.error = '';
+    this.success = '';
+    this.showToast = false;
+  
     if (this.registerForm.invalid) {
       return;
     }
-
+  
     this.loading = true;
     this.authService.register(
       this.f['username'].value,
@@ -66,17 +76,32 @@ export class RegisterComponent implements OnInit {
     )
     .pipe(first())
     .subscribe({
-      next: response => {
-        this.success = response.message || 'Registration successful';
+      next: (response) => {
+        console.log('Registration response:', response);
+        this.success = response.message || 'Registration successful!';
+        this.showToast = true;
         this.loading = false;
+        
+        // First timeout for initial message
         setTimeout(() => {
-          this.router.navigate(['/login']);
+          this.success = 'Redirecting to login page...';
+          
+          // Second timeout for navigation
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 1000);
         }, 2000);
       },
-      error: error => {
-        this.error = error.error?.message || 'Registration failed';
+      error: (error) => {
+        console.error('Registration error:', error);
+        this.error = error.message || 'Registration failed. Please try again.';
         this.loading = false;
+        this.showToast = false;
       }
     });
+  }
+  
+  closeToast() {
+    this.showToast = false;
   }
 }

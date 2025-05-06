@@ -1,4 +1,4 @@
-export interface Token {
+export interface JwtResponse {
     token: string;
     type: string;
     id: number;

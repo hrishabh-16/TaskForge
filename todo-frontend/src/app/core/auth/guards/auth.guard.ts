@@ -1,3 +1,4 @@
+// src/app/core/auth/guards/auth.guard.ts
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
@@ -6,21 +7,23 @@ import { AuthService } from '../services/auth.service';
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
-  constructor(private authService: AuthService, private router: Router) {}
-
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    if (this.authService.isAuthenticated()) {
-      // Check if route requires specific role
-      const requiredRole = route.data['role'] as string;
-      if (requiredRole && !this.authService.hasRole(requiredRole)) {
-        // If user doesn't have required role, redirect to dashboard
-        this.router.navigate(['/dashboard']);
-        return false;
-      }
+  
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+  
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): boolean {
+    const isAuthenticated = this.authService.isAuthenticated();
+    
+    if (isAuthenticated) {
       return true;
     }
-
-    // Not logged in, redirect to login page
+    
+    // Navigate to login page with return url
     this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
     return false;
   }

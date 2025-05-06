@@ -7,6 +7,7 @@ import { ClickOutsideDirective } from './directives/click-outside.directive';
 import { HighlightDirective } from './directives/highlight.directive';
 import { DateFormatPipe } from './pipes/date-format.pipe';
 import { FilterPipe } from './pipes/filter.pipe';
+import { RouterModule } from '@angular/router';
 
 
 
@@ -21,7 +22,13 @@ import { FilterPipe } from './pipes/filter.pipe';
     FilterPipe
   ],
   imports: [
-    CommonModule
+    CommonModule,
+    RouterModule
+  ],
+  exports: [
+    HeaderComponent,
+    SidebarComponent,
+    FooterComponent
   ]
 })
 export class SharedModule { }

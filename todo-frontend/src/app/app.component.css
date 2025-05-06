@@ -1,0 +1,19 @@
+/* src/app/app.component.css */
+/* Transitions */
+.transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+  
+  /* Make sure the content takes full height for proper footer positioning */
+  :host {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  /* Ensure the footer stays at the bottom */
+  .flex-1 {
+    flex: 1 1 0%;
+  }

@@ -1,2 +1,28 @@
+<!-- src/app/app.component.html -->
+<!-- Auth Pages Layout -->
+<div *ngIf="isAuthPage" class="min-h-screen bg-gray-100">
+  <router-outlet></router-outlet>
+</div>
 
-<router-outlet />
+<!-- Main App Layout (when authenticated) -->
+<div *ngIf="!isAuthPage" class="min-h-screen bg-gray-100 flex flex-col">
+  <app-header *ngIf="isAuthenticated"></app-header>
+  <div class="flex flex-1 overflow-hidden">
+    <app-sidebar *ngIf="isAuthenticated" #sidebar></app-sidebar>
+    
+    <!-- Main content with responsive margin based on sidebar state -->
+    <div class="flex-1 flex flex-col overflow-hidden transition-all duration-300" 
+         [ngClass]="{'md:ml-64': isAuthenticated && !sidebar?.isSidebarCollapsed, 'md:ml-16': isAuthenticated && sidebar?.isSidebarCollapsed}">
+      
+      <!-- Scrollable main area -->
+      <main class="flex-1 overflow-y-auto">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <router-outlet></router-outlet>
+        </div>
+      </main>
+      
+      <!-- Footer stays at the bottom -->
+      <app-footer *ngIf="isAuthenticated"></app-footer>
+    </div>
+  </div>
+</div>

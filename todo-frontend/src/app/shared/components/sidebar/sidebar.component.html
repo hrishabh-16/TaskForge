@@ -1,1 +1,402 @@
-<p>sidebar works!</p>
+<!-- src/app/shared/components/sidebar/sidebar.component.html -->
+<!-- Mobile menu button -->
+<div class="md:hidden fixed z-20 top-0 left-0 p-4">
+  <button type="button" (click)="toggleMobileMenu()" class="text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-black">
+    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+</div>
+
+<!-- Desktop sidebar toggle button (only visible when sidebar is collapsed) -->
+<div *ngIf="isSidebarCollapsed" class="hidden fixed z-20 top-5 left-5 md:flex">
+  <button type="button" (click)="toggleSidebar()" class="rounded-full bg-black p-2 text-white shadow-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black">
+    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+</div>
+
+<!-- Sidebar for mobile (off-canvas menu) -->
+<div *ngIf="isMobileMenuOpen" class="fixed inset-0 flex z-40 md:hidden">
+  <!-- Overlay -->
+  <div class="fixed inset-0 bg-gray-600 bg-opacity-75" (click)="toggleMobileMenu()"></div>
+  
+  <!-- Sidebar component -->
+  <div class="relative flex-1 flex flex-col max-w-xs w-full bg-white">
+    <div class="absolute top-0 right-0 -mr-12 pt-2">
+      <button type="button" (click)="toggleMobileMenu()" class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-white">
+        <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Sidebar content with scrolling -->
+    <div class="flex flex-col h-full">
+      <!-- App Logo/Brand (fixed at top) -->
+      <div class="flex-shrink-0 flex items-center justify-between px-4 h-16 bg-white border-b border-gray-200">
+        <div class="flex items-center">
+          <svg class="h-8 w-8 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          <span class="ml-2 text-xl font-bold text-gray-900">TaskMaster</span>
+        </div>
+      </div>
+      
+      <!-- New Task Button (sticky at top) -->
+      <div class="sticky top-0 z-10 flex-shrink-0 bg-white px-4 py-2 border-b border-gray-200">
+        <button class="w-full bg-black text-white py-2 px-4 rounded-md font-medium hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition duration-150" (click)="createNewTask()">
+          <div class="flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            New Task
+          </div>
+        </button>
+      </div>
+      
+      <!-- Scrollable navigation -->
+      <nav class="flex-1 px-2 py-4 bg-white space-y-2 overflow-y-auto">
+        <!-- Dashboard -->
+        <a (click)="navigateTo('/dashboard')" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-900 bg-gray-100 cursor-pointer hover:bg-gray-200 transition duration-150">
+          <svg class="mr-4 h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          Dashboard
+        </a>
+        
+        <!-- My Tasks Section -->
+        <div class="space-y-1">
+          <button (click)="toggleSection('myTasks')" class="w-full flex items-center justify-between px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+            <div class="flex items-center">
+              <svg class="mr-4 h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <span>My Tasks</span>
+            </div>
+            <svg class="h-5 w-5 transform transition-transform duration-200" [ngClass]="{'rotate-180': !myTasksCollapsed}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </button>
+          
+          <div *ngIf="!myTasksCollapsed" class="pl-10 space-y-1">
+            <a (click)="navigateTo('/tasks/today')" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+              <span class="truncate">Today</span>
+              <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
+                {{ taskStatistics.today }}
+              </span>
+            </a>
+            <a (click)="navigateTo('/tasks/upcoming')" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+              <span class="truncate">Upcoming</span>
+              <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
+                {{ taskStatistics.upcoming }}
+              </span>
+            </a>
+            <a (click)="navigateTo('/tasks/completed')" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+              <span class="truncate">Completed</span>
+              <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
+                {{ taskStatistics.completed }}
+              </span>
+            </a>
+            <a (click)="navigateTo('/tasks/overdue')" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+              <span class="truncate">Overdue</span>
+              <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-red-200 text-red-800">
+                {{ taskStatistics.overdue }}
+              </span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Projects / Lists Section -->
+        <div class="space-y-1">
+          <button (click)="toggleSection('projects')" class="w-full flex items-center justify-between px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+            <div class="flex items-center">
+              <svg class="mr-4 h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              <span>Projects</span>
+            </div>
+            <svg class="h-5 w-5 transform transition-transform duration-200" [ngClass]="{'rotate-180': !projectsCollapsed}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </button>
+          
+          <div *ngIf="!projectsCollapsed" class="pl-10 space-y-1">
+            <div *ngIf="isLoading" class="px-2 py-2 text-sm text-gray-500 animate-pulse">
+              Loading...
+            </div>
+            <div *ngIf="error" class="px-2 py-2 text-sm text-red-500">
+              {{ error }}
+            </div>
+            <div *ngIf="!isLoading && !error && taskLists.length === 0" class="px-2 py-2 text-sm text-gray-500">
+              No projects found
+            </div>
+            <a *ngFor="let list of taskLists" (click)="navigateTo('/task-lists/' + list.id)" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+              <span class="truncate">{{ list.name }}</span>
+              <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
+                {{ list.taskCount }}
+              </span>
+            </a>
+            <a (click)="navigateTo('/task-lists/new')" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+              <svg class="mr-2 h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+              </svg>
+              <span class="truncate text-gray-500">Add Project</span>
+            </a>
+          </div>
+        </div>
+        
+        <!-- Calendar View -->
+        <a (click)="navigateTo('/calendar')" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+          <svg class="mr-4 h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Calendar
+        </a>
+        
+        <!-- Categories / Tags Section -->
+        <div class="space-y-1">
+          <button (click)="toggleSection('categories')" class="w-full flex items-center justify-between px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+            <div class="flex items-center">
+              <svg class="mr-4 h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
+              <span>Categories</span>
+            </div>
+            <svg class="h-5 w-5 transform transition-transform duration-200" [ngClass]="{'rotate-180': !categoriesCollapsed}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </button>
+          
+          <div *ngIf="!categoriesCollapsed" class="pl-10 space-y-1">
+            <div *ngIf="isLoading" class="px-2 py-2 text-sm text-gray-500 animate-pulse">
+              Loading...
+            </div>
+            <div *ngIf="error" class="px-2 py-2 text-sm text-red-500">
+              {{ error }}
+            </div>
+            <div *ngIf="!isLoading && !error && categories.length === 0" class="px-2 py-2 text-sm text-gray-500">
+              No categories found
+            </div>
+            <a *ngFor="let category of categories" (click)="navigateTo('/categories/' + category.id)" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+              <span class="truncate">{{ category.name }}</span>
+              <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
+                {{ category.taskCount }}
+              </span>
+            </a>
+            <a (click)="navigateTo('/categories/new')" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+              <svg class="mr-2 h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+              </svg>
+              <span class="truncate text-gray-500">Add Category</span>
+            </a>
+          </div>
+        </div>
+        
+        <!-- Settings -->
+        <a (click)="navigateTo('/settings')" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+          <svg class="mr-4 h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          Settings
+        </a>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Desktop sidebar (collapsible) -->
+<div class="hidden md:block">
+  <div [ngClass]="{'w-64': !isSidebarCollapsed, 'w-16': isSidebarCollapsed}" 
+       class="transition-all duration-300 ease-in-out border-r border-gray-200 bg-white fixed h-full z-10 flex flex-col">
+    <!-- Header -->
+    <div class="flex-shrink-0 flex items-center justify-between h-16 px-4 border-b border-gray-200">
+      <!-- App Logo/Brand (only visible when sidebar is expanded) -->
+      <div *ngIf="!isSidebarCollapsed" class="flex items-center">
+        <svg class="h-8 w-8 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        <span class="ml-2 text-xl font-bold text-gray-900">TaskMaster</span>
+      </div>
+      
+      <!-- Collapse button -->
+      <button (click)="toggleSidebar()" class="p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black">
+        <svg *ngIf="!isSidebarCollapsed" class="h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+        </svg>
+        <svg *ngIf="isSidebarCollapsed" class="h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+    
+    <!-- New Task Button (sticky at top) -->
+    <div class="sticky top-0 z-10 flex-shrink-0 bg-white px-4 py-2 border-b border-gray-200">
+      <button *ngIf="!isSidebarCollapsed" class="w-full bg-black text-white py-2 px-4 rounded-md font-medium hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition duration-150" (click)="createNewTask()">
+        <div class="flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+          </svg>
+          New Task
+        </div>
+      </button>
+      
+      <!-- Compact "+" button when sidebar is collapsed -->
+      <button *ngIf="isSidebarCollapsed" class="w-10 h-10 bg-black text-white rounded-full hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition duration-150 flex items-center justify-center mx-auto" (click)="createNewTask()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Scrollable navigation -->
+    <nav class="flex-1 px-2 py-4 bg-white space-y-1 overflow-y-auto">
+      <!-- Dashboard -->
+      <a (click)="navigateTo('/dashboard')" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-900 bg-gray-100 cursor-pointer hover:bg-gray-200 transition duration-150">
+        <svg class="h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        <span *ngIf="!isSidebarCollapsed" class="ml-3">Dashboard</span>
+      </a>
+      
+      <!-- My Tasks Section -->
+      <div class="space-y-1">
+        <button (click)="toggleSection('myTasks')" class="w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+          <div class="flex items-center">
+            <svg class="h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <span *ngIf="!isSidebarCollapsed" class="ml-3">My Tasks</span>
+          </div>
+          <svg *ngIf="!isSidebarCollapsed" class="h-5 w-5 transform transition-transform duration-200" [ngClass]="{'rotate-180': !myTasksCollapsed}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        
+        <div *ngIf="!myTasksCollapsed && !isSidebarCollapsed" class="pl-9 space-y-1">
+          <a (click)="navigateTo('/tasks/today')" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+            <span class="truncate">Today</span>
+            <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
+              {{ taskStatistics.today }}
+            </span>
+          </a>
+          <a (click)="navigateTo('/tasks/upcoming')" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+            <span class="truncate">Upcoming</span>
+            <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
+              {{ taskStatistics.upcoming }}
+            </span>
+          </a>
+          <a (click)="navigateTo('/tasks/completed')" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+            <span class="truncate">Completed</span>
+            <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
+              {{ taskStatistics.completed }}
+            </span>
+          </a>
+          <a (click)="navigateTo('/tasks/overdue')" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+            <span class="truncate">Overdue</span>
+            <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-red-200 text-red-800">
+              {{ taskStatistics.overdue }}
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Projects / Lists Section -->
+      <div class="space-y-1">
+        <button (click)="toggleSection('projects')" class="w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+          <div class="flex items-center">
+            <svg class="h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            <span *ngIf="!isSidebarCollapsed" class="ml-3">Projects</span>
+          </div>
+          <svg *ngIf="!isSidebarCollapsed" class="h-5 w-5 transform transition-transform duration-200" [ngClass]="{'rotate-180': !projectsCollapsed}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        
+        <div *ngIf="!projectsCollapsed && !isSidebarCollapsed" class="pl-9 space-y-1">
+          <div *ngIf="isLoading" class="px-2 py-2 text-xs text-gray-500 animate-pulse">
+            Loading...
+          </div>
+          <div *ngIf="error" class="px-2 py-2 text-xs text-red-500">
+            {{ error }}
+          </div>
+          <div *ngIf="!isLoading && !error && taskLists.length === 0" class="px-2 py-2 text-xs text-gray-500">
+            No projects found
+          </div>
+          <a *ngFor="let list of taskLists" (click)="navigateTo('/task-lists/' + list.id)" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+            <span class="truncate">{{ list.name }}</span>
+            <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
+              {{ list.taskCount }}
+            </span>
+          </a>
+          <a (click)="navigateTo('/task-lists/new')" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+            <svg class="mr-2 h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            <span class="truncate text-gray-500">Add Project</span>
+          </a>
+        </div>
+      </div>
+      
+      <!-- Calendar View -->
+      <a (click)="navigateTo('/calendar')" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+        <svg class="h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <span *ngIf="!isSidebarCollapsed" class="ml-3">Calendar</span>
+      </a>
+      
+      <!-- Categories / Tags Section -->
+      <div class="space-y-1">
+        <button (click)="toggleSection('categories')" class="w-full flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+          <div class="flex items-center">
+            <svg class="h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+            <span *ngIf="!isSidebarCollapsed" class="ml-3">Categories</span>
+          </div>
+          <svg *ngIf="!isSidebarCollapsed" class="h-5 w-5 transform transition-transform duration-200" [ngClass]="{'rotate-180': !categoriesCollapsed}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        
+        <div *ngIf="!categoriesCollapsed && !isSidebarCollapsed" class="pl-9 space-y-1">
+          <div *ngIf="isLoading" class="px-2 py-2 text-xs text-gray-500 animate-pulse">
+            Loading...
+          </div>
+          <div *ngIf="error" class="px-2 py-2 text-xs text-red-500">
+            {{ error }}
+          </div>
+          <div *ngIf="!isLoading && !error && categories.length === 0" class="px-2 py-2 text-xs text-gray-500">
+            No categories found
+          </div>
+          <a *ngFor="let category of categories" (click)="navigateTo('/categories/' + category.id)" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+            <span class="truncate">{{ category.name }}</span>
+            <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
+              {{ category.taskCount }}
+            </span>
+          </a>
+          <a (click)="navigateTo('/categories/new')" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+            <svg class="mr-2 h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            <span class="truncate text-gray-500">Add Category</span>
+          </a>
+        </div>
+      </div>
+      
+      <!-- Settings -->
+      <a (click)="navigateTo('/settings')" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+        <svg class="h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span *ngIf="!isSidebarCollapsed" class="ml-3">Settings</span>
+      </a>
+    </nav>
+  </div>
+</div>
