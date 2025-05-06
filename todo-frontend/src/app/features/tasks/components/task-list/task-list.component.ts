@@ -102,8 +102,12 @@ export class TaskListComponent implements OnInit {
         this.isLoading = false;
       }
     } 
+    else if (url === '/tasks') {
+      // Default view for /tasks - show all tasks
+      this.loadAllTasks();
+    }
     else {
-      // Default view for /tasks
+      // Default view
       this.loadAllTasks();
     }
     

@@ -1,4 +1,5 @@
 <!-- src/app/shared/components/sidebar/sidebar.component.html -->
+
 <!-- Mobile menu button -->
 <div class="md:hidden fixed z-20 top-0 left-0 p-4">
   <button type="button" (click)="toggleMobileMenu()" class="text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-black">
@@ -40,7 +41,7 @@
           <svg class="h-8 w-8 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
-          <span class="ml-2 text-xl font-bold text-gray-900">TaskForge</span>
+          <span class="ml-2 text-xl font-bold text-gray-900">TaskMaster</span>
         </div>
       </div>
       
@@ -81,6 +82,14 @@
           </button>
           
           <div *ngIf="!myTasksCollapsed" class="pl-10 space-y-1">
+            <!-- New All Tasks Link -->
+            <a (click)="navigateTo('/tasks')" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+              <span class="truncate">All Tasks</span>
+              <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
+                {{ taskStatistics.total }}
+              </span>
+            </a>
+            
             <a (click)="navigateTo('/tasks/today')" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
               <span class="truncate">Today</span>
               <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
@@ -123,6 +132,11 @@
           </button>
           
           <div *ngIf="!projectsCollapsed" class="pl-10 space-y-1">
+            <!-- New All Task Lists Link -->
+            <a (click)="navigateTo('/task-lists')" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+              <span class="truncate">All Projects</span>
+            </a>
+            
             <div *ngIf="isLoading" class="px-2 py-2 text-sm text-gray-500 animate-pulse">
               Loading...
             </div>
@@ -170,6 +184,11 @@
           </button>
           
           <div *ngIf="!categoriesCollapsed" class="pl-10 space-y-1">
+            <!-- New All Categories Link -->
+            <a (click)="navigateTo('/categories')" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+              <span class="truncate">All Categories</span>
+            </a>
+            
             <div *ngIf="isLoading" class="px-2 py-2 text-sm text-gray-500 animate-pulse">
               Loading...
             </div>
@@ -218,7 +237,7 @@
         <svg class="h-8 w-8 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
         </svg>
-        <span class="ml-2 text-xl font-bold text-gray-900">TaskForge</span>
+        <span class="ml-2 text-xl font-bold text-gray-900">TaskMaster</span>
       </div>
       
       <!-- Collapse button -->
@@ -276,6 +295,14 @@
         </button>
         
         <div *ngIf="!myTasksCollapsed && !isSidebarCollapsed" class="pl-9 space-y-1">
+          <!-- New All Tasks Link -->
+          <a (click)="navigateTo('/tasks')" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+            <span class="truncate">All Tasks</span>
+            <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
+              {{ taskStatistics.total }}
+            </span>
+          </a>
+          
           <a (click)="navigateTo('/tasks/today')" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
             <span class="truncate">Today</span>
             <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
@@ -318,6 +345,11 @@
         </button>
         
         <div *ngIf="!projectsCollapsed && !isSidebarCollapsed" class="pl-9 space-y-1">
+          <!-- New All Task Lists Link -->
+          <a (click)="navigateTo('/task-lists')" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+            <span class="truncate">All Projects</span>
+          </a>
+          
           <div *ngIf="isLoading" class="px-2 py-2 text-xs text-gray-500 animate-pulse">
             Loading...
           </div>
@@ -365,6 +397,11 @@
         </button>
         
         <div *ngIf="!categoriesCollapsed && !isSidebarCollapsed" class="pl-9 space-y-1">
+          <!-- New All Categories Link -->
+          <a (click)="navigateTo('/categories')" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+            <span class="truncate">All Categories</span>
+          </a>
+          
           <div *ngIf="isLoading" class="px-2 py-2 text-xs text-gray-500 animate-pulse">
             Loading...
           </div>

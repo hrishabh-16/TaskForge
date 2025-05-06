@@ -263,7 +263,7 @@
               </ul>
             </div>
             <div *ngIf="categories.length > 0" class="px-4 py-3 bg-gray-50 text-right sm:px-6">
-              <a href="#" class="text-sm font-medium text-black hover:text-gray-800">
+              <a (click)="navigateTo('/categories')" class="text-sm font-medium text-black hover:text-gray-800 cursor-pointer">
                 Manage categories <span aria-hidden="true">&rarr;</span>
               </a>
             </div>
@@ -273,3 +273,4 @@
     </div>
   </div>
 </div>
+

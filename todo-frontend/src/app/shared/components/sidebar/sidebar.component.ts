@@ -1,3 +1,4 @@
+// src/app/shared/components/sidebar/sidebar.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CategoryService } from '../../../features/categories/services/category.service';
@@ -25,6 +26,7 @@ export class SidebarComponent implements OnInit {
   
   // Task statistics
   taskStatistics = {
+    total: 0,
     today: 0,
     upcoming: 0,
     completed: 0,
@@ -82,6 +84,9 @@ export class SidebarComponent implements OnInit {
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        // Total tasks
+        this.taskStatistics.total = tasks.length;
         
         // Today's tasks
         this.taskStatistics.today = tasks.filter(task => {
@@ -151,24 +156,7 @@ export class SidebarComponent implements OnInit {
       this.toggleMobileMenu();
     }
     
-    // Special handling for task-lists and categories to ensure proper navigation
-    if (route.startsWith('/task-lists/') && !route.includes('new') && !route.includes('edit')) {
-      const id = route.split('/').pop();
-      if (id && !isNaN(+id)) {
-        this.router.navigate(['/task-lists', id]);
-      } else {
-        this.router.navigate([route]);
-      }
-    } else if (route.startsWith('/categories/') && !route.includes('new') && !route.includes('edit')) {
-      const id = route.split('/').pop();
-      if (id && !isNaN(+id)) {
-        this.router.navigate(['/categories', id]);
-      } else {
-        this.router.navigate([route]);
-      }
-    } else {
-      this.router.navigate([route]);
-    }
+    this.router.navigate([route]);
   }
 
   createNewTask(): void {

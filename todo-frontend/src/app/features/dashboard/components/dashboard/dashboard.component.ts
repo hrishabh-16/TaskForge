@@ -5,7 +5,7 @@ import { TaskService } from '../../../tasks/services/task.service';
 import { CategoryService } from '../../../categories/services/category.service';
 import { TaskResponse } from '../../../tasks/models/task.model';
 import { CategoryResponse } from '../../../categories/models/category.model';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-dashboard',
   standalone:false,
@@ -28,11 +28,15 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private taskService: TaskService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
     this.loadDashboardData();
+  }
+  navigateTo(path: string): void {
+    this.router.navigateByUrl(path);
   }
   
   loadDashboardData(): void {
@@ -197,6 +201,7 @@ export class DashboardComponent implements OnInit {
     // Will be implemented in the Task module
     console.log('Create new task clicked from dashboard');
   }
+  
   
   retryLoading(): void {
     this.loadDashboardData();
