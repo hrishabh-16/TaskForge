@@ -150,10 +150,9 @@ export class DashboardComponent implements OnInit {
     }
   }
   
-  getCategoryColorClass(category: CategoryResponse): string {
+  getCategoryColorClass(category: CategoryResponse): any {
     if (category.color) {
-      // If the category has a custom color, return a generic class
-      return 'bg-gray-100 text-gray-800';
+      return { 'background-color': category.color };
     }
     
     // Default colors based on category name or id
@@ -167,6 +166,25 @@ export class DashboardComponent implements OnInit {
     ];
     
     return colors[category.id % colors.length];
+  }
+  
+  // Add this method to the dashboard component
+  getContrastColor(hexColor?: string): string {
+    if (!hexColor) return 'text-black';
+    
+    // Remove # if present
+    hexColor = hexColor.replace('#', '');
+    
+    // Convert to RGB
+    const r = parseInt(hexColor.substr(0, 2), 16);
+    const g = parseInt(hexColor.substr(2, 2), 16);
+    const b = parseInt(hexColor.substr(4, 2), 16);
+    
+    // Calculate brightness (YIQ formula)
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    
+    // Return white text for dark backgrounds, black text for light backgrounds
+    return brightness > 128 ? 'text-black' : 'text-white';
   }
   
   formatDate(dateString: string | undefined): string {

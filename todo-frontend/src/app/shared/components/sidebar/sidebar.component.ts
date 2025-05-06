@@ -1,4 +1,3 @@
-// src/app/shared/components/sidebar/sidebar.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CategoryService } from '../../../features/categories/services/category.service';
@@ -147,15 +146,37 @@ export class SidebarComponent implements OnInit {
   }
 
   navigateTo(route: string): void {
-    this.router.navigate([route]);
     // Close mobile menu when navigating
     if (this.isMobileMenuOpen) {
       this.toggleMobileMenu();
     }
+    
+    // Special handling for task-lists and categories to ensure proper navigation
+    if (route.startsWith('/task-lists/') && !route.includes('new') && !route.includes('edit')) {
+      const id = route.split('/').pop();
+      if (id && !isNaN(+id)) {
+        this.router.navigate(['/task-lists', id]);
+      } else {
+        this.router.navigate([route]);
+      }
+    } else if (route.startsWith('/categories/') && !route.includes('new') && !route.includes('edit')) {
+      const id = route.split('/').pop();
+      if (id && !isNaN(+id)) {
+        this.router.navigate(['/categories', id]);
+      } else {
+        this.router.navigate([route]);
+      }
+    } else {
+      this.router.navigate([route]);
+    }
   }
 
   createNewTask(): void {
-    // Will be implemented in the Task module
-    console.log('Create new task clicked');
+    this.router.navigate(['/tasks/new']);
+    
+    // Close mobile menu
+    if (this.isMobileMenuOpen) {
+      this.toggleMobileMenu();
+    }
   }
 }

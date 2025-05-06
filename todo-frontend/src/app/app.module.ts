@@ -9,6 +9,10 @@ import { AppComponent } from './app.component';
 // Feature Modules
 import { AuthModule } from './features/auth/auth.module';
 import { DashboardModule } from './features/dashboard/dashboard.module';
+import { TasksModule } from './features/tasks/tasks.module';
+import { TaskListsModule } from './features/task-lists/task-lists.module';
+import { CategoriesModule } from './features/categories/categories.module';
+
 import { SharedModule } from './shared/shared.module';
 
 // Auth Components (since they're not declared in AuthModule yet)
@@ -39,6 +43,9 @@ import { TaskListService } from './features/task-lists/services/task-list.servic
     AppRoutingModule,
     AuthModule,
     DashboardModule,
+    TasksModule,
+    TaskListsModule,
+    CategoriesModule,
     SharedModule
   ],
   providers: [

@@ -1,1 +1,274 @@
-<p>task-list works!</p>
+<div class="py-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+    <div class="flex justify-between items-center">
+      <h1 class="text-2xl font-semibold text-gray-900">
+        <!-- Title based on view mode -->
+        <span *ngIf="viewMode === 'all' && !taskListId && !categoryId">All Tasks</span>
+        <span *ngIf="viewMode === 'today'">Today's Tasks</span>
+        <span *ngIf="viewMode === 'upcoming'">Upcoming Tasks</span>
+        <span *ngIf="viewMode === 'completed'">Completed Tasks</span>
+        <span *ngIf="viewMode === 'overdue'">Overdue Tasks</span>
+        <span *ngIf="taskListId">Tasks in {{ taskListName || 'List' }}</span>
+        <span *ngIf="categoryId">Tasks in {{ categoryName || 'Category' }}</span>
+      </h1>
+      <button (click)="createTask()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        New Task
+      </button>
+    </div>
+    
+    <!-- Filters and Search -->
+    <div class="mt-6 bg-white shadow rounded-lg p-4">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0 sm:space-x-4">
+        <!-- Search Box -->
+        <div class="flex-1 min-w-0">
+          <div class="relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <input [(ngModel)]="searchKeyword" (keyup.enter)="search()" type="text" class="focus:ring-black focus:border-black block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search tasks...">
+            <div *ngIf="searchKeyword" class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" (click)="clearSearch()">
+              <svg class="h-5 w-5 text-gray-400 hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Filter Dropdowns -->
+        <div class="flex items-center space-x-3">
+          <!-- Status Filter -->
+          <select [(ngModel)]="statusFilter" (change)="applyFilters()" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-black focus:border-black sm:text-sm rounded-md">
+            <option [ngValue]="null">All Statuses</option>
+            <option value="PENDING">Pending</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="ON_HOLD">On Hold</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+          
+          <!-- Priority Filter -->
+          <select [(ngModel)]="priorityFilter" (change)="applyFilters()" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-black focus:border-black sm:text-sm rounded-md">
+            <option [ngValue]="null">All Priorities</option>
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
+            <option value="URGENT">Urgent</option>
+          </select>
+          
+          <!-- Clear Filters Button -->
+          <button (click)="clearFilters()" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+            <svg class="-ml-0.5 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+            Clear
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Loading Indicator -->
+    <div *ngIf="isLoading" class="mt-6 py-10 flex justify-center">
+      <div class="flex items-center space-x-2">
+        <svg class="animate-spin h-8 w-8 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="text-xl font-medium text-gray-700">Loading tasks...</span>
+      </div>
+    </div>
+    
+    <!-- Error Message -->
+    <div *ngIf="error" class="mt-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+      <span class="block sm:inline">{{ error }}</span>
+      <button (click)="refreshTasks()" class="mt-2 bg-red-700 hover:bg-red-800 text-white font-bold py-1 px-3 rounded text-sm">
+        Retry
+      </button>
+    </div>
+    
+   <!-- No Tasks Message -->
+   <div *ngIf="!isLoading && !error && filteredTasks.length === 0" class="mt-6 bg-white shadow rounded-lg py-8">
+    <div class="text-center">
+      <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No tasks found</h3>
+      <p class="mt-1 text-sm text-gray-500">Get started by creating a new task.</p>
+      <div class="mt-6">
+        <button (click)="createTask()" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+          <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+          </svg>
+          New Task
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Task List -->
+  <div *ngIf="!isLoading && !error && filteredTasks.length > 0" class="mt-6 bg-white shadow overflow-hidden sm:rounded-md">
+    <!-- Table Header -->
+    <div class="bg-gray-50 border-b border-gray-200 px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:grid md:grid-cols-12 gap-4">
+      <div class="md:col-span-1"></div>
+      <div class="md:col-span-4 cursor-pointer" (click)="setSorting('title')">
+        Task
+        <span *ngIf="sortBy === 'title'" class="ml-1">
+          <svg *ngIf="sortDirection === 'asc'" class="h-4 w-4 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          <svg *ngIf="sortDirection === 'desc'" class="h-4 w-4 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </span>
+      </div>
+      <div class="md:col-span-2 cursor-pointer" (click)="setSorting('dueDate')">
+        Due Date
+        <span *ngIf="sortBy === 'dueDate'" class="ml-1">
+          <svg *ngIf="sortDirection === 'asc'" class="h-4 w-4 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          <svg *ngIf="sortDirection === 'desc'" class="h-4 w-4 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </span>
+      </div>
+      <div class="md:col-span-1 cursor-pointer" (click)="setSorting('priority')">
+        Priority
+        <span *ngIf="sortBy === 'priority'" class="ml-1">
+          <svg *ngIf="sortDirection === 'asc'" class="h-4 w-4 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          <svg *ngIf="sortDirection === 'desc'" class="h-4 w-4 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </span>
+      </div>
+      <div class="md:col-span-1 cursor-pointer" (click)="setSorting('status')">
+        Status
+        <span *ngIf="sortBy === 'status'" class="ml-1">
+          <svg *ngIf="sortDirection === 'asc'" class="h-4 w-4 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          <svg *ngIf="sortDirection === 'desc'" class="h-4 w-4 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </span>
+      </div>
+      <div class="md:col-span-3">Actions</div>
+    </div>
+    
+    <!-- Task Items -->
+    <ul role="list" class="divide-y divide-gray-200">
+      <li *ngFor="let task of filteredTasks" class="block hover:bg-gray-50 cursor-pointer" (click)="viewTaskDetails(task.id)">
+        <div class="px-4 py-4 sm:px-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center min-w-0 space-x-3">
+              <!-- Checkbox -->
+              <div class="flex-shrink-0" (click)="toggleTaskStatus(task, $event)">
+                <input type="checkbox" [checked]="task.status === 'COMPLETED'" class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded cursor-pointer">
+              </div>
+              
+              <!-- Task Info -->
+              <div class="min-w-0 flex-1 md:grid md:grid-cols-9 md:gap-4">
+                <!-- Title and Description -->
+                <div class="md:col-span-4">
+                  <p class="text-sm font-medium text-gray-900 truncate" [ngClass]="{'line-through': task.status === 'COMPLETED', 'text-gray-500': task.status === 'COMPLETED'}">
+                    {{ task.title }}
+                  </p>
+                  <p *ngIf="task.description" class="mt-1 text-sm text-gray-500 truncate" [ngClass]="{'line-through': task.status === 'COMPLETED'}">
+                    {{ task.description }}
+                  </p>
+                  <div *ngIf="task.taskListName || task.categoryName" class="mt-1 flex items-center text-xs text-gray-500 space-x-2">
+                    <span *ngIf="task.taskListName" class="inline-flex items-center">
+                      <svg class="h-3 w-3 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+                      </svg>
+                      {{ task.taskListName }}
+                    </span>
+                    <span *ngIf="task.categoryName" class="inline-flex items-center">
+                      <svg class="h-3 w-3 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                      </svg>
+                      {{ task.categoryName }}
+                    </span>
+                  </div>
+                </div>
+                
+                <!-- Due Date -->
+                <div class="mt-2 md:mt-0 md:col-span-2">
+                  <div *ngIf="task.dueDate" class="flex items-center text-sm text-gray-500">
+                    <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                    </svg>
+                    <span [ngClass]="{
+                      'text-red-600 font-medium': isOverdue(task.dueDate),
+                      'text-yellow-600 font-medium': isDueSoon(task.dueDate) && !isOverdue(task.dueDate)
+                    }">
+                      {{ formatDate(task.dueDate) }}
+                    </span>
+                  </div>
+                  <div *ngIf="!task.dueDate" class="flex items-center text-sm text-gray-500">
+                    <span class="text-gray-400">No due date</span>
+                  </div>
+                </div>
+                
+                <!-- Priority -->
+                <div class="mt-2 md:mt-0 md:col-span-1">
+                  <span [ngClass]="getPriorityClass(task.priority)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                    {{ task.priority }}
+                  </span>
+                </div>
+                
+                <!-- Status -->
+                <div class="mt-2 md:mt-0 md:col-span-2">
+                  <span [ngClass]="getStatusClass(task.status)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                    {{ task.status }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="ml-4 flex-shrink-0 flex space-x-2">
+              <button (click)="editTask(task.id, $event)" class="inline-flex items-center p-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                </svg>
+              </button>
+              <button (click)="deleteTask(task.id, $event)" class="inline-flex items-center p-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+  
+  <!-- Pagination (simplified) -->
+  <div *ngIf="!isLoading && !error && filteredTasks.length > 0" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+    <div class="flex-1 flex justify-between sm:hidden">
+      <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+        Previous
+      </button>
+      <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+        Next
+      </button>
+    </div>
+    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+      <div>
+        <p class="text-sm text-gray-700">
+          Showing <span class="font-medium">1</span> to <span class="font-medium">{{ filteredTasks.length }}</span> of <span class="font-medium">{{ filteredTasks.length }}</span> results
+        </p>
+      </div>
+      <!-- For now, this is a placeholder for pagination controls -->
+    </div>
+  </div>
+</div>
+</div>
