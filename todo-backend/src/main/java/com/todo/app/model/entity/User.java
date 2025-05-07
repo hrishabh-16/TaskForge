@@ -27,6 +27,7 @@ public class User {
 
     @NotBlank
     @Size(max = 50)
+    @Column(updatable = true)
     private String username;
 
     @NotBlank
@@ -50,6 +51,15 @@ public class User {
     
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Notification> notifications = new HashSet<>();
+    
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private UserSettings userSettings;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<UserLoginActivity> loginActivities = new HashSet<>();
+
+    @Column(name = "last_login_time")
+    private LocalDateTime lastLoginTime;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -138,6 +148,30 @@ public class User {
 
 	public void setNotifications(Set<Notification> notifications) {
 		this.notifications = notifications;
+	}
+
+	public UserSettings getUserSettings() {
+		return userSettings;
+	}
+
+	public void setUserSettings(UserSettings userSettings) {
+		this.userSettings = userSettings;
+	}
+
+	public Set<UserLoginActivity> getLoginActivities() {
+		return loginActivities;
+	}
+
+	public void setLoginActivities(Set<UserLoginActivity> loginActivities) {
+		this.loginActivities = loginActivities;
+	}
+
+	public LocalDateTime getLastLoginTime() {
+		return lastLoginTime;
+	}
+
+	public void setLastLoginTime(LocalDateTime lastLoginTime) {
+		this.lastLoginTime = lastLoginTime;
 	}
     
     

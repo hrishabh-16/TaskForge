@@ -1,0 +1,270 @@
+<!-- src/app/features/profile/components/profile/profile.component.html -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">My Profile</h1>
+  
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+    </div>
+  
+    <!-- Error State -->
+    <div *ngIf="!isLoading && error" class="bg-red-50 border border-red-200 text-red-800 rounded-md p-4 mb-4">
+      <p>{{ error }}</p>
+    </div>
+  
+    <!-- Profile Content -->
+    <div *ngIf="!isLoading && !error && profile" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Profile Summary Card -->
+      <div class="col-span-1">
+        <div class="bg-white shadow rounded-lg p-6 mb-6">
+          <div class="flex items-center justify-center mb-4">
+            <div class="h-20 w-20 rounded-full bg-gray-800 flex items-center justify-center text-white text-2xl uppercase">
+              {{ profile.username.charAt(0) }}
+            </div>
+          </div>
+          
+          <div class="text-center mb-4">
+            <h2 class="text-xl font-bold text-gray-900">{{ profile.username }}</h2>
+            <p class="text-gray-600">{{ profile.email }}</p>
+          </div>
+          
+          <div class="text-center mb-4">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+              {{ getRoleDisplay(profile.roles) }}
+            </span>
+          </div>
+          
+          <div class="border-t border-gray-200 pt-4">
+            <p class="flex justify-between text-sm">
+              <span class="text-gray-500">Account created:</span>
+              <span class="text-gray-900 font-medium">{{ formatDate(profile.createdAt) }}</span>
+            </p>
+            <p class="flex justify-between text-sm mt-2">
+              <span class="text-gray-500">Last login:</span>
+              <span class="text-gray-900 font-medium">{{ profile.lastLoginAt ? formatDate(profile.lastLoginAt) : 'N/A' }}</span>
+            </p>
+            <p class="flex justify-between text-sm mt-2">
+              <span class="text-gray-500">Status:</span>
+              <span [ngClass]="profile.enabled ? 'text-green-600' : 'text-red-600'" class="font-medium">
+                {{ profile.enabled ? 'Active' : 'Inactive' }}
+              </span>
+            </p>
+          </div>
+        </div>
+        
+        <!-- Task Statistics Card -->
+        <div class="bg-white shadow rounded-lg p-6">
+          <h3 class="text-lg font-bold text-gray-900 mb-4">Task Statistics</h3>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-blue-50 p-4 rounded-md">
+              <p class="text-xs text-blue-800 font-medium">Total Tasks</p>
+              <p class="text-2xl font-bold text-blue-800">{{ profile.taskStats?.total || 0 }}</p>
+            </div>
+            
+            <div class="bg-green-50 p-4 rounded-md">
+              <p class="text-xs text-green-800 font-medium">Completed</p>
+              <p class="text-2xl font-bold text-green-800">{{ profile.taskStats?.completed || 0 }}</p>
+            </div>
+            
+            <div class="bg-yellow-50 p-4 rounded-md">
+              <p class="text-xs text-yellow-800 font-medium">Pending</p>
+              <p class="text-2xl font-bold text-yellow-800">{{ profile.taskStats?.pending || 0 }}</p>
+            </div>
+            
+            <div class="bg-red-50 p-4 rounded-md">
+              <p class="text-xs text-red-800 font-medium">Overdue</p>
+              <p class="text-2xl font-bold text-red-800">{{ profile.taskStats?.overdue || 0 }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Profile Details and Edit Forms -->
+      <div class="col-span-1 lg:col-span-2">
+        <!-- Profile Information Card -->
+        <div class="bg-white shadow rounded-lg p-6 mb-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-gray-900">Account Information</h3>
+            <button 
+              (click)="toggleEditMode()" 
+              class="px-4 py-2 text-sm text-gray-600 font-medium rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black">
+              {{ isEditMode ? 'Cancel' : 'Edit Profile' }}
+            </button>
+          </div>
+          
+          <!-- View Mode -->
+          <div *ngIf="!isEditMode">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p class="text-sm font-medium text-gray-500">Username</p>
+                <p class="mt-1 text-gray-900">{{ profile.username }}</p>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500">Email</p>
+                <p class="mt-1 text-gray-900">{{ profile.email }}</p>
+              </div>
+            </div>
+            
+            <div class="mt-4">
+              <button 
+                (click)="togglePasswordChange()" 
+                class="px-4 py-2 text-sm text-white font-medium rounded-md bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black">
+                Change Password
+              </button>
+            </div>
+          </div>
+          
+          <!-- Edit Mode -->
+          <form *ngIf="isEditMode" [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+            <div class="mb-4">
+              <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+              <input 
+                type="text" 
+                id="username" 
+                formControlName="username" 
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring focus:ring-black focus:ring-opacity-50"
+                [ngClass]="{'border-red-300': profileForm.get('username')?.invalid && profileForm.get('username')?.touched}">
+              <div *ngIf="profileForm.get('username')?.invalid && profileForm.get('username')?.touched" class="text-red-600 text-sm mt-1">
+                <span *ngIf="profileForm.get('username')?.errors?.['required']">Username is required</span>
+                <span *ngIf="profileForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters</span>
+                <span *ngIf="profileForm.get('username')?.errors?.['maxlength']">Username cannot exceed 50 characters</span>
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Email</label>
+              <input 
+                type="text" 
+                disabled 
+                [value]="profile.email" 
+                class="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm">
+              <p class="text-sm text-gray-500 mt-1">Email cannot be changed</p>
+            </div>
+            
+            <div class="flex justify-end">
+              <button 
+                type="button" 
+                (click)="toggleEditMode()" 
+                class="mr-3 px-4 py-2 text-sm text-gray-600 font-medium rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black">
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                [disabled]="profileForm.invalid || profileForm.pristine" 
+                [ngClass]="{'bg-gray-400': profileForm.invalid || profileForm.pristine, 'bg-black hover:bg-gray-800': !(profileForm.invalid || profileForm.pristine)}"
+                class="px-4 py-2 text-sm text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-black">
+                Save Changes
+              </button>
+            </div>
+          </form>
+          
+          <!-- Password Change Form -->
+          <form *ngIf="isChangingPassword" [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="mt-6 pt-6 border-t border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Change Password</h3>
+            
+            <div class="mb-4">
+              <label for="currentPassword" class="block text-sm font-medium text-gray-700">Current Password</label>
+              <input 
+                type="password" 
+                id="currentPassword" 
+                formControlName="currentPassword" 
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring focus:ring-black focus:ring-opacity-50"
+                [ngClass]="{'border-red-300': passwordForm.get('currentPassword')?.invalid && passwordForm.get('currentPassword')?.touched}">
+              <div *ngIf="passwordForm.get('currentPassword')?.invalid && passwordForm.get('currentPassword')?.touched" class="text-red-600 text-sm mt-1">
+                <span *ngIf="passwordForm.get('currentPassword')?.errors?.['required']">Current password is required</span>
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <label for="newPassword" class="block text-sm font-medium text-gray-700">New Password</label>
+              <input 
+                type="password" 
+                id="newPassword" 
+                formControlName="newPassword" 
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring focus:ring-black focus:ring-opacity-50"
+                [ngClass]="{'border-red-300': passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched}">
+              <div *ngIf="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched" class="text-red-600 text-sm mt-1">
+                <span *ngIf="passwordForm.get('newPassword')?.errors?.['required']">New password is required</span>
+                <span *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']">Password must be at least 6 characters</span>
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+              <input 
+                type="password" 
+                id="confirmPassword" 
+                formControlName="confirmPassword" 
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring focus:ring-black focus:ring-opacity-50"
+                [ngClass]="{'border-red-300': (passwordForm.get('confirmPassword')?.invalid || passwordForm.errors?.['passwordMismatch']) && passwordForm.get('confirmPassword')?.touched}">
+              <div *ngIf="(passwordForm.get('confirmPassword')?.invalid || passwordForm.errors?.['passwordMismatch']) && passwordForm.get('confirmPassword')?.touched" class="text-red-600 text-sm mt-1">
+                <span *ngIf="passwordForm.get('confirmPassword')?.errors?.['required']">Confirm password is required</span>
+                <span *ngIf="passwordForm.errors?.['passwordMismatch']">Passwords do not match</span>
+              </div>
+            </div>
+            
+            <div class="flex justify-end">
+              <button 
+                type="button" 
+                (click)="togglePasswordChange()" 
+                class="mr-3 px-4 py-2 text-sm text-gray-600 font-medium rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black">
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                [disabled]="passwordForm.invalid" 
+                [ngClass]="{'bg-gray-400': passwordForm.invalid, 'bg-black hover:bg-gray-800': !passwordForm.invalid}"
+                class="px-4 py-2 text-sm text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-black">
+                Change Password
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Login Activity Card -->
+        <div class="bg-white shadow rounded-lg p-6">
+          <h3 class="text-lg font-bold text-gray-900 mb-4">Login Activity</h3>
+          
+          <!-- Loading State -->
+          <div *ngIf="loadingActivities" class="flex justify-center items-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-black"></div>
+          </div>
+          
+          <!-- Empty State -->
+          <div *ngIf="!loadingActivities && (!loginActivities || loginActivities.length === 0)" class="py-4 text-center text-gray-500">
+            No login activity found
+          </div>
+          
+          <!-- Activity List -->
+          <div *ngIf="!loadingActivities && loginActivities && loginActivities.length > 0" class="overflow-hidden rounded-md border border-gray-200">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP Address</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Device</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let activity of loginActivities">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(activity.timestamp) }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ activity.ipAddress }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ activity.device }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span 
+                      [ngClass]="activity.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" 
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                      {{ activity.success ? 'Success' : 'Failed' }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

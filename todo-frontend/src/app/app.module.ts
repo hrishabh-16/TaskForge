@@ -1,10 +1,13 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ReactiveFormsModule,FormsModule} from '@angular/forms';
 import { AuthInterceptor } from './core/auth/interceptors/auth.interceptor';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { ToastrModule } from 'ngx-toastr';
+
 
 // Feature Modules
 import { AuthModule } from './features/auth/auth.module';
@@ -14,7 +17,8 @@ import { TaskListsModule } from './features/task-lists/task-lists.module';
 import { CategoriesModule } from './features/categories/categories.module';
 import { CommentsModule } from './features/comments/comments.module';
 import { AttachmentsModule } from './features/attachments/attachments.module';
-
+import { ProfileModule } from './features/profile/profile.module';
+import { SettingsModule } from './features/settings/settings.module';
 import { SharedModule } from './shared/shared.module';
 
 // Auth Components (since they're not declared in AuthModule yet)
@@ -30,6 +34,9 @@ import { CategoryService } from './features/categories/services/category.service
 import { TaskListService } from './features/task-lists/services/task-list.service';
 import { CommentService } from './features/comments/services/comment.service';
 import { AttachmentService } from './features/attachments/services/attachment.service';
+import { ProfileService } from './features/profile/services/profile.service';
+import { SettingsService } from './features/settings/services/settings.service';
+
 
 @NgModule({
   declarations: [
@@ -41,17 +48,25 @@ import { AttachmentService } from './features/attachments/services/attachment.se
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     ReactiveFormsModule,
     FormsModule,
     HttpClientModule,
     AppRoutingModule,
     AuthModule,
+    ToastrModule.forRoot({
+      timeOut: 3000,
+      positionClass: 'toast-top-right',
+      preventDuplicates: true,
+    }),
     DashboardModule,
     TasksModule,
     TaskListsModule,
     CategoriesModule,
     CommentsModule,
     AttachmentsModule,
+    ProfileModule,
+    SettingsModule,
     SharedModule
   ],
   providers: [
@@ -60,7 +75,9 @@ import { AttachmentService } from './features/attachments/services/attachment.se
     CategoryService,
     TaskListService,
     CommentService,
-    AttachmentService
+    AttachmentService,
+    ProfileService,
+    SettingsService
   ],
   bootstrap: [AppComponent]
 })

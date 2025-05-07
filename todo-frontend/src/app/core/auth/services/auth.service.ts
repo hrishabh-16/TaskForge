@@ -1,3 +1,4 @@
+// src/app/core/auth/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError, of, from } from 'rxjs';
@@ -109,6 +110,14 @@ export class AuthService {
   hasRole(role: string): boolean {
     const user = this.currentUserValue;
     return user !== null && user.roles && user.roles.includes(role);
+  }
+
+  /**
+   * Update current user information without making an API call
+   * Used for updating local user data after profile changes
+   */
+  updateCurrentUser(user: User): void {
+    this.currentUserSubject.next(user);
   }
 
   private handleError(error: HttpErrorResponse) {

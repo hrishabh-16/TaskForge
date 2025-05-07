@@ -57,8 +57,8 @@
         </button>
       </div>
       
-      <!-- Scrollable navigation -->
-      <nav class="flex-1 px-2 py-4 bg-white space-y-2 overflow-y-auto">
+      <!-- Scrollable navigation - with max-height and overflow-y-auto to ensure scrollability -->
+      <nav class="flex-1 px-2 py-4 bg-white space-y-2 overflow-y-auto" style="max-height: calc(100vh - 120px);">
         <!-- Dashboard -->
         <a (click)="navigateTo('/dashboard')" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-900 bg-gray-100 cursor-pointer hover:bg-gray-200 transition duration-150">
           <svg class="mr-4 h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -221,6 +221,14 @@
           </svg>
           Settings
         </a>
+        
+        <!-- Profile Link -->
+        <a (click)="navigateTo('/profile')" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+          <svg class="mr-4 h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          Profile
+        </a>
       </nav>
     </div>
   </div>
@@ -270,8 +278,8 @@
       </button>
     </div>
     
-    <!-- Scrollable navigation -->
-    <nav class="flex-1 px-2 py-4 bg-white space-y-1 overflow-y-auto">
+    <!-- Scrollable navigation with fixed height and overflow handling -->
+    <nav class="flex-1 px-2 py-4 bg-white space-y-1 overflow-y-auto" style="max-height: calc(100vh - 120px);">
       <!-- Dashboard -->
       <a (click)="navigateTo('/dashboard')" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-900 bg-gray-100 cursor-pointer hover:bg-gray-200 transition duration-150">
         <svg class="h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -433,6 +441,14 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
         <span *ngIf="!isSidebarCollapsed" class="ml-3">Settings</span>
+      </a>
+      
+      <!-- Profile Link -->
+      <a (click)="navigateTo('/profile')" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+        <svg class="h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+        <span *ngIf="!isSidebarCollapsed" class="ml-3">Profile</span>
       </a>
     </nav>
   </div>

@@ -1,6 +1,7 @@
 package com.todo.app.repository;
 
 import com.todo.app.model.entity.Task;
+import com.todo.app.model.entity.User;
 import com.todo.app.model.enums.TaskStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +13,8 @@ import java.util.List;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
+	
+	  List<Task> findByUser(User user);
     
     List<Task> findByUserIdOrderByCreatedAtDesc(Long userId);
     

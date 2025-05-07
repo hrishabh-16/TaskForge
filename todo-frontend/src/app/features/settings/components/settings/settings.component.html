@@ -1,0 +1,434 @@
+<!-- src/app/features/settings/components/settings/settings.component.html -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Settings</h1>
+  
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+    </div>
+  
+    <!-- Error State -->
+    <div *ngIf="!isLoading && error" class="bg-red-50 border border-red-200 text-red-800 rounded-md p-4 mb-4">
+      <p>{{ error }}</p>
+    </div>
+  
+    <!-- Settings Content -->
+    <div *ngIf="!isLoading && !error && settings" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      
+      <!-- Settings Navigation -->
+      <div class="col-span-1">
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <nav class="flex flex-col">
+            <button 
+              (click)="switchTab('account')" 
+              class="px-4 py-3 text-left text-sm font-medium border-l-4 transition-colors" 
+              [ngClass]="selectedTab === 'account' ? 'border-black bg-gray-50 text-black' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900'">
+              Account
+            </button>
+            <button 
+              (click)="switchTab('notifications')" 
+              class="px-4 py-3 text-left text-sm font-medium border-l-4 transition-colors" 
+              [ngClass]="selectedTab === 'notifications' ? 'border-black bg-gray-50 text-black' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900'">
+              Notifications
+            </button>
+            <button 
+              (click)="switchTab('appearance')" 
+              class="px-4 py-3 text-left text-sm font-medium border-l-4 transition-colors" 
+              [ngClass]="selectedTab === 'appearance' ? 'border-black bg-gray-50 text-black' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900'">
+              Appearance
+            </button>
+            <button 
+              (click)="switchTab('privacy')" 
+              class="px-4 py-3 text-left text-sm font-medium border-l-4 transition-colors" 
+              [ngClass]="selectedTab === 'privacy' ? 'border-black bg-gray-50 text-black' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900'">
+              Privacy
+            </button>
+            <button 
+              (click)="switchTab('danger')" 
+              class="px-4 py-3 text-left text-sm font-medium border-l-4 transition-colors" 
+              [ngClass]="selectedTab === 'danger' ? 'border-red-500 bg-red-50 text-red-700' : 'border-transparent text-red-600 hover:bg-red-50 hover:text-red-700'">
+              Danger Zone
+            </button>
+          </nav>
+        </div>
+      </div>
+      
+      <!-- Settings Content -->
+      <div class="col-span-1 md:col-span-3">
+        <!-- Account Settings -->
+        <div *ngIf="selectedTab === 'account'" class="bg-white shadow rounded-lg p-6">
+          <h2 class="text-lg font-bold text-gray-900 mb-4">Account Settings</h2>
+          
+          <form [formGroup]="accountSettingsForm" (ngSubmit)="saveAccountSettings()">
+            <div class="mb-4">
+              <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+              <input 
+                type="text" 
+                id="username" 
+                formControlName="username" 
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring focus:ring-black focus:ring-opacity-50"
+                [ngClass]="{'border-red-300': accountSettingsForm.get('username')?.invalid && accountSettingsForm.get('username')?.touched}">
+              <div *ngIf="accountSettingsForm.get('username')?.invalid && accountSettingsForm.get('username')?.touched" class="text-red-600 text-sm mt-1">
+                <span *ngIf="accountSettingsForm.get('username')?.errors?.['required']">Username is required</span>
+                <span *ngIf="accountSettingsForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters</span>
+                <span *ngIf="accountSettingsForm.get('username')?.errors?.['maxlength']">Username cannot exceed 50 characters</span>
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+              <input 
+                type="email" 
+                id="email" 
+                formControlName="email" 
+                class="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm">
+              <p class="text-sm text-gray-500 mt-1">Email cannot be changed</p>
+            </div>
+            
+            <div class="flex justify-end">
+              <button 
+                type="submit" 
+                [disabled]="accountSettingsForm.invalid || accountSettingsForm.pristine" 
+                [ngClass]="{'bg-gray-400': accountSettingsForm.invalid || accountSettingsForm.pristine, 'bg-black hover:bg-gray-800': !(accountSettingsForm.invalid || accountSettingsForm.pristine)}"
+                class="px-4 py-2 text-sm text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-black">
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Notification Settings -->
+        <div *ngIf="selectedTab === 'notifications'" class="bg-white shadow rounded-lg p-6">
+          <h2 class="text-lg font-bold text-gray-900 mb-4">Notification Settings</h2>
+          
+          <form [formGroup]="notificationSettingsForm" (ngSubmit)="saveNotificationSettings()">
+            <div class="space-y-4">
+              <div class="flex items-start">
+                <div class="flex items-center h-5">
+                  <input 
+                    type="checkbox" 
+                    id="emailNotifications" 
+                    formControlName="emailNotifications" 
+                    class="h-4 w-4 text-black border-gray-300 rounded focus:ring-black">
+                </div>
+                <div class="ml-3 text-sm">
+                  <label for="emailNotifications" class="font-medium text-gray-700">Email Notifications</label>
+                  <p class="text-gray-500">Receive notifications via email</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start">
+                <div class="flex items-center h-5">
+                  <input 
+                    type="checkbox" 
+                    id="taskReminders" 
+                    formControlName="taskReminders" 
+                    class="h-4 w-4 text-black border-gray-300 rounded focus:ring-black">
+                </div>
+                <div class="ml-3 text-sm">
+                  <label for="taskReminders" class="font-medium text-gray-700">Task Reminders</label>
+                  <p class="text-gray-500">Get reminded of upcoming tasks</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start">
+                <div class="flex items-center h-5">
+                  <input 
+                    type="checkbox" 
+                    id="dueDateAlerts" 
+                    formControlName="dueDateAlerts" 
+                    class="h-4 w-4 text-black border-gray-300 rounded focus:ring-black">
+                </div>
+                <div class="ml-3 text-sm">
+                  <label for="dueDateAlerts" class="font-medium text-gray-700">Due Date Alerts</label>
+                  <p class="text-gray-500">Receive alerts when tasks are due or overdue</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start">
+                <div class="flex items-center h-5">
+                  <input 
+                    type="checkbox" 
+                    id="systemNotifications" 
+                    formControlName="systemNotifications" 
+                    class="h-4 w-4 text-black border-gray-300 rounded focus:ring-black">
+                </div>
+                <div class="ml-3 text-sm">
+                  <label for="systemNotifications" class="font-medium text-gray-700">System Notifications</label>
+                  <p class="text-gray-500">Receive important system updates</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex justify-end mt-6">
+              <button 
+                type="submit" 
+                class="px-4 py-2 text-sm text-white font-medium bg-black rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black">
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Appearance Settings -->
+        <div *ngIf="selectedTab === 'appearance'" class="bg-white shadow rounded-lg p-6">
+          <h2 class="text-lg font-bold text-gray-900 mb-4">Appearance Settings</h2>
+          
+          <form [formGroup]="appearanceSettingsForm" (ngSubmit)="saveAppearanceSettings()">
+            <div class="space-y-4">
+              <div class="flex items-start">
+                <div class="flex items-center h-5">
+                  <input 
+                    type="checkbox" 
+                    id="darkMode" 
+                    formControlName="darkMode" 
+                    class="h-4 w-4 text-black border-gray-300 rounded focus:ring-black">
+                </div>
+                <div class="ml-3 text-sm">
+                  <label for="darkMode" class="font-medium text-gray-700">Dark Mode</label>
+                  <p class="text-gray-500">Use dark theme for the application</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start">
+                <div class="flex items-center h-5">
+                  <input 
+                    type="checkbox" 
+                    id="compactMode" 
+                    formControlName="compactMode" 
+                    class="h-4 w-4 text-black border-gray-300 rounded focus:ring-black">
+                </div>
+                <div class="ml-3 text-sm">
+                  <label for="compactMode" class="font-medium text-gray-700">Compact Mode</label>
+                  <p class="text-gray-500">Use compact layout to display more content</p>
+                </div>
+              </div>
+              
+              <div class="mt-4">
+                <label for="fontSize" class="block text-sm font-medium text-gray-700">Font Size</label>
+                <select 
+                  id="fontSize" 
+                  formControlName="fontSize" 
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring focus:ring-black focus:ring-opacity-50">
+                  <option value="small">Small</option>
+                  <option value="medium">Medium</option>
+                  <option value="large">Large</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="flex justify-end mt-6">
+              <button 
+                type="submit" 
+                class="px-4 py-2 text-sm text-white font-medium bg-black rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black">
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Privacy Settings -->
+        <div *ngIf="selectedTab === 'privacy'" class="bg-white shadow rounded-lg p-6">
+          <h2 class="text-lg font-bold text-gray-900 mb-4">Privacy Settings</h2>
+          
+          <form [formGroup]="privacySettingsForm" (ngSubmit)="savePrivacySettings()">
+            <div class="space-y-4">
+              <div class="flex items-start">
+                <div class="flex items-center h-5">
+                  <input 
+                    type="checkbox" 
+                    id="shareTaskStatistics" 
+                    formControlName="shareTaskStatistics" 
+                    class="h-4 w-4 text-black border-gray-300 rounded focus:ring-black">
+                </div>
+                <div class="ml-3 text-sm">
+                  <label for="shareTaskStatistics" class="font-medium text-gray-700">Share Task Statistics</label>
+                  <p class="text-gray-500">Allow anonymous usage data to improve the service</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start">
+                <div class="flex items-center h-5">
+                  <input 
+                    type="checkbox" 
+                    id="allowDataCollection" 
+                    formControlName="allowDataCollection" 
+                    class="h-4 w-4 text-black border-gray-300 rounded focus:ring-black">
+                </div>
+                <div class="ml-3 text-sm">
+                  <label for="allowDataCollection" class="font-medium text-gray-700">Allow Data Collection</label>
+                  <p class="text-gray-500">Allow collection of usage data to improve your experience</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-6">
+              <button 
+                type="button" 
+                (click)="exportUserData()" 
+                class="px-4 py-2 text-sm text-black font-medium border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black mb-4">
+                Export My Data
+              </button>
+              <p class="text-sm text-gray-500">Download all your personal data in JSON format</p>
+            </div>
+            
+            <div class="flex justify-end mt-6">
+              <button 
+                type="submit" 
+                class="px-4 py-2 text-sm text-white font-medium bg-black rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black">
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Danger Zone -->
+        <div *ngIf="selectedTab === 'danger'" class="bg-white shadow rounded-lg p-6">
+          <h2 class="text-lg font-bold text-gray-900 mb-4">Danger Zone</h2>
+          
+          <div class="space-y-6">
+            <!-- Account Status Toggle -->
+            <div *ngIf="!isDeactivating && !isDeleting" class="p-4 border border-gray-200 rounded-md">
+              <div class="flex justify-between items-center">
+                <div>
+                  <h3 class="text-base font-medium text-gray-900">
+                    {{ settings.accountActive ? 'Deactivate Account' : 'Reactivate Account' }}
+                  </h3>
+                  <p class="text-sm text-gray-500 mt-1">
+                    {{ settings.accountActive ? 
+                      'Temporarily disable your account. You can reactivate it anytime.' : 
+                      'Reactivate your account to continue using the service.' }}
+                  </p>
+                </div>
+                <div class="flex items-center">
+                  <span class="mr-3 text-sm">
+                    {{ settings.accountActive ? 'Active' : 'Inactive' }}
+                  </span>
+                  <button 
+                    type="button" 
+                    (click)="toggleAccountStatus()" 
+                    class="relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black" 
+                    [ngClass]="{'bg-gray-400': !settings.accountActive, 'bg-green-500': settings.accountActive}">
+                    <span 
+                      class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200" 
+                      [ngClass]="{'translate-x-0': !settings.accountActive, 'translate-x-5': settings.accountActive}">
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Deactivate Account Form -->
+                        <div *ngIf="isDeactivating" class="p-4 border border-red-200 rounded-md bg-red-50">
+                <h3 class="text-base font-medium text-red-800 mb-3">Deactivate Your Account</h3>
+                <p class="text-sm text-red-600 mb-4">
+                  Are you sure you want to deactivate your account? Your data will be preserved, but you won't be able to access it until you reactivate your account.
+                </p>
+                
+                <form [formGroup]="deactivateAccountForm" (ngSubmit)="deactivateAccount()">
+                  <div class="mb-4">
+                    <label for="deactivate-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                    <input 
+                      type="password" 
+                      id="deactivate-password" 
+                      formControlName="password" 
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring focus:ring-red-500 focus:ring-opacity-50"
+                      [ngClass]="{'border-red-300': deactivateAccountForm.get('password')?.invalid && deactivateAccountForm.get('password')?.touched}">
+                    <div *ngIf="deactivateAccountForm.get('password')?.invalid && deactivateAccountForm.get('password')?.touched" class="text-red-600 text-sm mt-1">
+                      <span *ngIf="deactivateAccountForm.get('password')?.errors?.['required']">Password is required to confirm deactivation</span>
+                    </div>
+                  </div>
+                  
+                  <div class="mb-4">
+                    <label for="reason" class="block text-sm font-medium text-gray-700">Reason for Deactivation (Optional)</label>
+                    <textarea 
+                      id="reason" 
+                      rows="3" 
+                      formControlName="reason" 
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring focus:ring-red-500 focus:ring-opacity-50"
+                      placeholder="Please tell us why you're deactivating your account"></textarea>
+                  </div>
+                  
+                  <div class="flex justify-end space-x-3">
+                    <button 
+                      type="button" 
+                      (click)="cancelDeactivation()" 
+                      class="px-4 py-2 text-sm text-gray-700 font-medium border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500">
+                      Cancel
+                    </button>
+                    <button 
+                      type="submit" 
+                      [disabled]="deactivateAccountForm.get('password')?.invalid" 
+                      [ngClass]="{'bg-gray-400': deactivateAccountForm.get('password')?.invalid, 'bg-red-600 hover:bg-red-700': !deactivateAccountForm.get('password')?.invalid}"
+                      class="px-4 py-2 text-sm text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                      Deactivate
+                    </button>
+                  </div>
+                </form>
+              </div>
+              
+              <!-- Delete Account Form -->
+              <div *ngIf="isDeleting" class="p-4 border border-red-200 rounded-md bg-red-50">
+                <h3 class="text-base font-medium text-red-800 mb-3">Delete Your Account</h3>
+                <p class="text-sm text-red-600 mb-4">
+                  <strong>Warning:</strong> This action cannot be undone. All of your data, including tasks, projects, and settings will be permanently deleted.
+                </p>
+                
+                <form [formGroup]="deleteAccountForm" (ngSubmit)="deleteAccount()">
+                  <div class="mb-4">
+                    <label for="delete-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                    <input 
+                      type="password" 
+                      id="delete-password" 
+                      formControlName="password" 
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring focus:ring-red-500 focus:ring-opacity-50"
+                      [ngClass]="{'border-red-300': deleteAccountForm.get('password')?.invalid && deleteAccountForm.get('password')?.touched}">
+                    <div *ngIf="deleteAccountForm.get('password')?.invalid && deleteAccountForm.get('password')?.touched" class="text-red-600 text-sm mt-1">
+                      <span *ngIf="deleteAccountForm.get('password')?.errors?.['required']">Password is required to confirm deletion</span>
+                    </div>
+                  </div>
+                  
+                  <div class="mb-4">
+                    <label for="confirmPhrase" class="block text-sm font-medium text-gray-700">
+                      Type "{{ deleteConfirmPhrase }}" to confirm deletion
+                    </label>
+                    <input 
+                      type="text" 
+                      id="confirmPhrase" 
+                      formControlName="confirmPhrase" 
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring focus:ring-red-500 focus:ring-opacity-50"
+                      [ngClass]="{'border-red-300': deleteAccountForm.get('confirmPhrase')?.invalid && deleteAccountForm.get('confirmPhrase')?.touched}">
+                    <div *ngIf="deleteAccountForm.get('confirmPhrase')?.invalid && deleteAccountForm.get('confirmPhrase')?.touched" class="text-red-600 text-sm mt-1">
+                      <span *ngIf="deleteAccountForm.get('confirmPhrase')?.errors?.['required']">Confirmation phrase is required</span>
+                      <span *ngIf="deleteAccountForm.get('confirmPhrase')?.errors?.['incorrectPhrase']">Confirmation phrase does not match</span>
+                    </div>
+                  </div>
+                  
+                  <div class="flex justify-end space-x-3">
+                    <button 
+                      type="button" 
+                      (click)="cancelDeletion()" 
+                      class="px-4 py-2 text-sm text-gray-700 font-medium border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500">
+                      Cancel
+                    </button>
+                    <button 
+                      type="submit" 
+                      [disabled]="deleteAccountForm.invalid" 
+                      [ngClass]="{'bg-gray-400': deleteAccountForm.invalid, 'bg-red-600 hover:bg-red-700': !deleteAccountForm.invalid}"
+                      class="px-4 py-2 text-sm text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                      Delete Permanently
+                    </button>
+                  </div>
+                </form>
+              </div>
+              
+              <!-- Danger Zone Actions -->
+              <div *ngIf="!isDeactivating && !isDeleting" class="mt-6">
+                <button 
+                  type="button" 
+                  (click)="showDeleteConfirmation()" 
+                  class="w-full flex justify-center py-2 px-4 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 mb-4">
+                  Delete Account
+                </button>
+                <p class="text-xs text-gray-500 text-center">This action cannot be undone</p>
+              </div>

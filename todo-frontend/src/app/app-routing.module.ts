@@ -12,6 +12,8 @@ import { TaskListListComponent } from './features/task-lists/components/task-lis
 import { TaskListFormComponent } from './features/task-lists/components/task-list-form/task-list-form.component';
 import { CategoryListComponent } from './features/categories/components/category-list/category-list.component';
 import { CategoryFormComponent } from './features/categories/components/category-form/category-form.component';
+import { ProfileComponent } from './features/profile/components/profile/profile.component';
+import { SettingsComponent } from './features/settings/components/settings/settings.component';
 import { AuthGuard } from './core/auth/guards/auth.guard';
 
 const routes: Routes = [
@@ -46,7 +48,12 @@ const routes: Routes = [
   { path: 'categories/new', component: CategoryFormComponent, canActivate: [AuthGuard] },
   { path: 'categories/:id', component: TaskListComponent, canActivate: [AuthGuard] },
   { path: 'categories/:id/edit', component: CategoryFormComponent, canActivate: [AuthGuard] },
+   
+   // Profile Route
+   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   
+   // Settings Route
+   { path: 'settings', component: SettingsComponent, canActivate: [AuthGuard] },
   
   // Calendar placeholder route
   { path: 'calendar', component: DashboardComponent, canActivate: [AuthGuard] },

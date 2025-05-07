@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -189,5 +190,10 @@ public class Task {
 
     public void setNotifications(List<Notification> notifications) {
         this.notifications = notifications;
+    }
+    
+    // Convenience method to get the local date from the datetime
+    public LocalDate toLocalDate() {
+        return dueDate != null ? dueDate.toLocalDate() : null;
     }
 }
