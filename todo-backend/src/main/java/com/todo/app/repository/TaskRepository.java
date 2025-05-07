@@ -56,4 +56,11 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
                           @Param("keyword") String keyword,
                           @Param("dueDateFrom") LocalDateTime dueDateFrom,
                           @Param("dueDateTo") LocalDateTime dueDateTo);
+    
+    
+     @Query("SELECT t FROM Task t WHERE t.user.id = :userId AND t.status != 'COMPLETED' AND t.dueDate > :now AND t.dueDate < :soon ORDER BY t.dueDate ASC")
+    List<Task> findTasksDueSoon(@Param("userId") Long userId, @Param("now") LocalDateTime now, @Param("soon") LocalDateTime soon);
+
+    @Query("SELECT t FROM Task t WHERE t.status != 'COMPLETED' AND t.dueDate < :now ORDER BY t.dueDate ASC")
+    List<Task> findAllOverdueTasks(@Param("now") LocalDateTime now);
 }

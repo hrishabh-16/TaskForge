@@ -25,4 +25,7 @@ public interface TaskService {
     TaskResponse markTaskAsCompleted(Long taskId);
     
     List<TaskResponse> getOverdueTasks();
+    
+    void checkTasksDueSoon();
+    void checkOverdueTasks();
 }

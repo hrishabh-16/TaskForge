@@ -52,6 +52,10 @@ public class Task {
     @JoinColumn(name = "task_list_id")
     private TaskList taskList;
     
+    private LocalDateTime lastDueSoonNotificationSent;
+    private LocalDateTime lastOverdueNotificationSent;
+    
+    
     
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments = new HashSet<>();
@@ -62,8 +66,26 @@ public class Task {
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> notifications = new ArrayList<>();
     
+    
+    
 
-    public Set<Comment> getComments() {
+    public LocalDateTime getLastDueSoonNotificationSent() {
+		return lastDueSoonNotificationSent;
+	}
+
+	public void setLastDueSoonNotificationSent(LocalDateTime lastDueSoonNotificationSent) {
+		this.lastDueSoonNotificationSent = lastDueSoonNotificationSent;
+	}
+
+	public LocalDateTime getLastOverdueNotificationSent() {
+		return lastOverdueNotificationSent;
+	}
+
+	public void setLastOverdueNotificationSent(LocalDateTime lastOverdueNotificationSent) {
+		this.lastOverdueNotificationSent = lastOverdueNotificationSent;
+	}
+
+	public Set<Comment> getComments() {
 		return comments;
 	}
 

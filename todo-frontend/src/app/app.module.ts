@@ -8,6 +8,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ToastrModule } from 'ngx-toastr';
 
+// Core Module
+import { CoreModule } from './core/core.module';
 
 // Feature Modules
 import { AuthModule } from './features/auth/auth.module';
@@ -18,6 +20,7 @@ import { CategoriesModule } from './features/categories/categories.module';
 import { CommentsModule } from './features/comments/comments.module';
 import { AttachmentsModule } from './features/attachments/attachments.module';
 import { ProfileModule } from './features/profile/profile.module';
+import { NotificationsModule } from './features/notifications/notifications.module';
 import { SettingsModule } from './features/settings/settings.module';
 import { SharedModule } from './shared/shared.module';
 
@@ -53,6 +56,7 @@ import { SettingsService } from './features/settings/services/settings.service';
     FormsModule,
     HttpClientModule,
     AppRoutingModule,
+    CoreModule,
     AuthModule,
     ToastrModule.forRoot({
       timeOut: 3000,
@@ -67,6 +71,7 @@ import { SettingsService } from './features/settings/services/settings.service';
     AttachmentsModule,
     ProfileModule,
     SettingsModule,
+    NotificationsModule,
     SharedModule
   ],
   providers: [

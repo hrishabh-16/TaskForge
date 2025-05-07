@@ -1,1 +1,93 @@
-<p>notification-list works!</p>
+<!-- todo-frontend/src/app/features/notifications/components/notification-list/notification-list.component.html -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+      <div class="px-4 py-5 border-b border-gray-200 sm:px-6 flex justify-between items-center">
+        <div>
+          <h3 class="text-lg leading-6 font-medium text-gray-900">Notifications</h3>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500">
+            Stay updated with your tasks and account activities
+          </p>
+        </div>
+        <button 
+          (click)="markAllAsRead()" 
+          class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          <svg class="h-4 w-4 mr-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          Mark all as read
+        </button>
+      </div>
+      
+      <div class="bg-white divide-y divide-gray-200">
+        <div *ngIf="loading" class="py-10 text-center">
+          <svg class="animate-spin h-8 w-8 mx-auto text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p class="mt-2 text-sm text-gray-500">Loading notifications...</p>
+        </div>
+        
+        <div *ngIf="!loading && notifications.length === 0" class="py-10 text-center">
+          <svg class="h-12 w-12 mx-auto text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">No notifications</h3>
+          <p class="mt-1 text-sm text-gray-500">You're all caught up!</p>
+        </div>
+        
+        <ng-container *ngIf="!loading && notifications.length > 0">
+          <div *ngFor="let notification of notifications" 
+               [ngClass]="{'bg-blue-50': !notification.isRead}" 
+               class="p-4 hover:bg-gray-50 cursor-pointer transition duration-150 ease-in-out"
+               (click)="navigateToNotificationSource(notification)">
+            <div class="flex items-start">
+              <div [ngClass]="getNotificationColor(notification.type)" class="flex-shrink-0 mt-1">
+                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <!-- Dynamic path based on notification type -->
+                  <ng-container [ngSwitch]="getNotificationIcon(notification.type)">
+                    <path *ngSwitchCase="'clock'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path *ngSwitchCase="'alert-triangle'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    <path *ngSwitchCase="'refresh-cw'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    <path *ngSwitchCase="'user-plus'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    <path *ngSwitchCase="'check-circle'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path *ngSwitchCase="'key'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    <path *ngSwitchCase="'user-check'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    <path *ngSwitchDefault stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </ng-container>
+                </svg>
+              </div>
+              <div class="ml-3 flex-1">
+                <div class="flex justify-between">
+                  <p [ngClass]="{'font-semibold': !notification.isRead}" class="text-sm text-gray-900">
+                    {{ notification.title }}
+                  </p>
+                  <div class="flex space-x-2">
+                    <p class="text-xs text-gray-500">{{ formatTimeAgo(notification.createdAt) }}</p>
+                    <button (click)="deleteNotification(notification, $event)" class="text-gray-400 hover:text-gray-500">
+                      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <p class="mt-1 text-sm text-gray-600">{{ notification.message }}</p>
+                <div class="mt-2 flex">
+                  <button 
+                    *ngIf="!notification.isRead" 
+                    (click)="markAsRead(notification, $event)" 
+                    class="inline-flex items-center text-xs font-medium text-indigo-600 hover:text-indigo-900"
+                  >
+                    <svg class="h-3 w-3 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Mark as read
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>

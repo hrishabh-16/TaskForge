@@ -14,6 +14,8 @@ import { CategoryListComponent } from './features/categories/components/category
 import { CategoryFormComponent } from './features/categories/components/category-form/category-form.component';
 import { ProfileComponent } from './features/profile/components/profile/profile.component';
 import { SettingsComponent } from './features/settings/components/settings/settings.component';
+import { NotificationListComponent } from './features/notifications/components/notification-list/notification-list.component';
+
 import { AuthGuard } from './core/auth/guards/auth.guard';
 
 const routes: Routes = [
@@ -54,6 +56,10 @@ const routes: Routes = [
   
    // Settings Route
    { path: 'settings', component: SettingsComponent, canActivate: [AuthGuard] },
+
+   // Notifications Route
+  { path: 'notifications', component: NotificationListComponent, canActivate: [AuthGuard] },
+  
   
   // Calendar placeholder route
   { path: 'calendar', component: DashboardComponent, canActivate: [AuthGuard] },

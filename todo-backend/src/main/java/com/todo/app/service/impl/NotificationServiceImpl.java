@@ -1,3 +1,4 @@
+// todo-backend/src/main/java/com/todo/app/service/impl/NotificationServiceImpl.java
 package com.todo.app.service.impl;
 
 import com.todo.app.model.dto.response.NotificationResponse;
@@ -8,6 +9,7 @@ import com.todo.app.model.enums.NotificationType;
 import com.todo.app.repository.NotificationRepository;
 import com.todo.app.repository.UserRepository;
 import com.todo.app.service.interfaces.NotificationService;
+import com.todo.app.service.interfaces.NotificationWebSocketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +29,9 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private NotificationWebSocketService notificationWebSocketService;
 
     @Override
     public void createNotification(User user, String title, String message, NotificationType type, Task task) {
@@ -36,7 +41,11 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setMessage(message);
         notification.setType(type);
         notification.setTask(task);
-        notificationRepository.save(notification);
+        notification = notificationRepository.save(notification);
+        
+        // Send real-time notification via WebSocket
+        NotificationResponse notificationResponse = mapToNotificationResponse(notification);
+        notificationWebSocketService.sendNotification(user.getUsername(), notificationResponse);
     }
 
     @Override
@@ -72,9 +81,10 @@ public class NotificationServiceImpl implements NotificationService {
     public void markAllAsRead() {
         User currentUser = getCurrentUser();
         List<Notification> notifications = notificationRepository.findByUserIdAndIsReadFalse(currentUser.getId());
+        LocalDateTime now = LocalDateTime.now();
         notifications.forEach(notification -> {
             notification.setRead(true);
-            notification.setReadAt(LocalDateTime.now());
+            notification.setReadAt(now);
         });
         notificationRepository.saveAll(notifications);
     }

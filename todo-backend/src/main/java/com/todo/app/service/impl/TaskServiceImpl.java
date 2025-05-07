@@ -19,6 +19,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.scheduling.annotation.Scheduled;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -169,5 +172,89 @@ public class TaskServiceImpl implements TaskService {
         String username = authentication.getName();
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Current user not found"));
+    }
+    
+    @Scheduled(cron = "0 0 */6 * * *") // Run every 6 hours
+    public void checkTasksDueSoon() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime soon = now.plusHours(24); // Consider "soon" as within 24 hours
+        
+        // Get all users
+        List<User> users = userRepository.findAll();
+        
+        for (User user : users) {
+            List<Task> dueSoonTasks = taskRepository.findTasksDueSoon(user.getId(), now, soon);
+            for (Task task : dueSoonTasks) {
+                // Only notify if not already notified recently
+                if (task.getLastDueSoonNotificationSent() == null || 
+                    task.getLastDueSoonNotificationSent().isBefore(now.minusHours(12))) {
+                    
+                    String title = "Task Due Soon";
+                    String message = "Your task '" + task.getTitle() + "' is due " + 
+                                    formatDueDate(task.getDueDate());
+                    
+                    notificationService.createNotification(
+                        task.getUser(), 
+                        title,
+                        message,
+                        NotificationType.TASK_DUE_SOON,
+                        task
+                    );
+                    
+                    // Update last notification sent time
+                    task.setLastDueSoonNotificationSent(now);
+                    taskRepository.save(task);
+                }
+            }
+        }
+    }
+
+    @Scheduled(cron = "0 0 0 * * *") // Run at midnight every day
+    public void checkOverdueTasks() {
+        LocalDateTime now = LocalDateTime.now();
+        
+        // Get all users
+        List<User> users = userRepository.findAll();
+        
+        for (User user : users) {
+            List<Task> overdueTasks = taskRepository.findOverdueTasks(user.getId(), now);
+            for (Task task : overdueTasks) {
+                // Only notify if not already notified recently
+                if (task.getLastOverdueNotificationSent() == null || 
+                    task.getLastOverdueNotificationSent().isBefore(now.minusDays(1))) {
+                    
+                    String title = "Task Overdue";
+                    String message = "Your task '" + task.getTitle() + "' was due " + 
+                                    formatDueDate(task.getDueDate()) + " and is now overdue.";
+                    
+                    notificationService.createNotification(
+                        task.getUser(), 
+                        title,
+                        message,
+                        NotificationType.TASK_OVERDUE,
+                        task
+                    );
+                    
+                    // Update last notification sent time
+                    task.setLastOverdueNotificationSent(now);
+                    taskRepository.save(task);
+                }
+            }
+        }
+    }
+
+    private String formatDueDate(LocalDateTime dueDate) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate today = now.toLocalDate();
+        LocalDate tomorrow = today.plusDays(1);
+        LocalDate dueDateDay = dueDate.toLocalDate();
+        
+        if (dueDateDay.isEqual(today)) {
+            return "today at " + dueDate.format(DateTimeFormatter.ofPattern("h:mm a"));
+        } else if (dueDateDay.isEqual(tomorrow)) {
+            return "tomorrow at " + dueDate.format(DateTimeFormatter.ofPattern("h:mm a"));
+        } else {
+            return "on " + dueDate.format(DateTimeFormatter.ofPattern("MMMM d, yyyy 'at' h:mm a"));
+        }
     }
 }
