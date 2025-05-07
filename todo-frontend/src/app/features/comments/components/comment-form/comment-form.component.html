@@ -1,1 +1,46 @@
-<p>comment-form works!</p>
+<!-- todo-frontend/src/app/features/comments/components/comment-form/comment-form.component.html -->
+
+<div class="mt-3">
+    <form [formGroup]="commentForm" (ngSubmit)="onSubmit()">
+      <!-- Error Message -->
+      <div *ngIf="error" class="mb-3 bg-red-100 border-l-4 border-red-500 text-red-700 p-3 rounded" role="alert">
+        <p>{{ error }}</p>
+      </div>
+      
+      <div class="mb-3">
+        <textarea 
+          rows="3" 
+          formControlName="content" 
+          class="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black"
+          placeholder="Write a comment..."
+        ></textarea>
+        
+        <div *ngIf="commentForm.get('content')?.invalid && (commentForm.get('content')?.dirty || commentForm.get('content')?.touched)" class="mt-1 text-sm text-red-600">
+          <div *ngIf="commentForm.get('content')?.errors?.['required']">Comment content is required.</div>
+          <div *ngIf="commentForm.get('content')?.errors?.['maxlength']">Comment cannot exceed 1000 characters.</div>
+        </div>
+      </div>
+      
+      <div class="flex justify-end space-x-2">
+        <button 
+          *ngIf="commentToEdit"
+          type="button" 
+          (click)="onCancel()"
+          class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+        >
+          Cancel
+        </button>
+        <button 
+          type="submit" 
+          [disabled]="commentForm.invalid || isSubmitting"
+          class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded shadow-sm text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50"
+        >
+          <svg *ngIf="isSubmitting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ commentToEdit ? 'Update' : 'Post' }}
+        </button>
+      </div>
+    </form>
+  </div>

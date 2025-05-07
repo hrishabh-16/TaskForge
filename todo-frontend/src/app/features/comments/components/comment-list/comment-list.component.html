@@ -1,1 +1,87 @@
-<p>comment-list works!</p>
+<!-- todo-frontend/src/app/features/comments/components/comment-list/comment-list.component.html -->
+
+<div class="mt-6 border-t border-gray-200 pt-4">
+    <h3 class="text-lg font-medium text-gray-900">Comments</h3>
+    
+    <!-- Add Comment Form -->
+    <app-comment-form 
+      [taskId]="taskId" 
+      [commentToEdit]="commentToEdit" 
+      (commentCreated)="handleCommentCreated($event)" 
+      (commentUpdated)="handleCommentUpdated($event)" 
+      (cancelEdit)="cancelEdit()"
+    ></app-comment-form>
+    
+    <!-- Loading Indicator -->
+    <div *ngIf="isLoading" class="py-4 flex justify-center">
+      <div class="flex items-center space-x-2">
+        <svg class="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="text-sm font-medium text-gray-700">Loading comments...</span>
+      </div>
+    </div>
+    
+    <!-- Error Message -->
+    <div *ngIf="error" class="mt-3 bg-red-100 border-l-4 border-red-500 text-red-700 p-3 rounded" role="alert">
+      <p>{{ error }}</p>
+      <button (click)="loadComments()" class="mt-2 bg-red-700 hover:bg-red-800 text-white font-bold py-1 px-2 rounded text-xs">
+        Retry
+      </button>
+    </div>
+    
+    <!-- No Comments Message -->
+    <div *ngIf="!isLoading && !error && comments.length === 0" class="mt-4 py-4 text-center text-gray-500">
+      <p>No comments yet. Be the first to add a comment!</p>
+    </div>
+    
+    <!-- Comments List -->
+    <div *ngIf="!isLoading && comments.length > 0" class="mt-4 space-y-4">
+      <div *ngFor="let comment of comments" class="bg-gray-50 p-3 rounded">
+        <div class="flex justify-between items-start">
+          <div class="flex items-start">
+            <!-- User info and comment content -->
+            <div class="flex-shrink-0 mr-3">
+              <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                <span class="text-gray-600 text-sm font-medium">{{ comment.username.charAt(0).toUpperCase() }}</span>
+              </div>
+            </div>
+            
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900">
+                {{ comment.username }}
+                <span class="ml-2 text-xs text-gray-500">{{ formatDate(comment.createdAt) }}</span>
+                <span *ngIf="comment.createdAt !== comment.updatedAt" class="ml-1 text-xs italic">(edited)</span>
+              </p>
+              <div class="mt-1 text-sm text-gray-700">
+                <p>{{ comment.content }}</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Actions -->
+          <div class="flex space-x-2">
+            <button 
+              (click)="editComment(comment)" 
+              class="text-gray-400 hover:text-gray-600"
+              [ngClass]="{'opacity-50 cursor-not-allowed': commentToEdit !== null}"
+              [disabled]="commentToEdit !== null"
+            >
+              <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+              </svg>
+            </button>
+            <button 
+              (click)="deleteComment(comment.id)" 
+              class="text-gray-400 hover:text-red-600"
+            >
+              <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

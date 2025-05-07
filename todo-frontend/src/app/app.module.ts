@@ -12,6 +12,7 @@ import { DashboardModule } from './features/dashboard/dashboard.module';
 import { TasksModule } from './features/tasks/tasks.module';
 import { TaskListsModule } from './features/task-lists/task-lists.module';
 import { CategoriesModule } from './features/categories/categories.module';
+import { CommentsModule } from './features/comments/comments.module';
 
 import { SharedModule } from './shared/shared.module';
 
@@ -26,6 +27,7 @@ import { ResetPasswordComponent } from './features/auth/components/reset-passwor
 import { TaskService } from './features/tasks/services/task.service';
 import { CategoryService } from './features/categories/services/category.service';
 import { TaskListService } from './features/task-lists/services/task-list.service';
+import { CommentService } from './features/comments/services/comment.service';
 
 @NgModule({
   declarations: [
@@ -46,13 +48,15 @@ import { TaskListService } from './features/task-lists/services/task-list.servic
     TasksModule,
     TaskListsModule,
     CategoriesModule,
+    CommentsModule,
     SharedModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true } ,
     TaskService,
     CategoryService,
-    TaskListService 
+    TaskListService,
+    CommentService
   ],
   bootstrap: [AppComponent]
 })

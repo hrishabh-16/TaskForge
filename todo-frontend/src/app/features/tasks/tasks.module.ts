@@ -5,7 +5,9 @@ import { RouterModule } from '@angular/router';
 import { TasksRoutingModule } from './tasks-routing.module';
 import { TaskListComponent } from './components/task-list/task-list.component';
 import { TaskDetailComponent } from './components/task-detail/task-detail.component';
+import { CommentsModule } from '../comments/comments.module';
 import { TaskFormComponent } from './components/task-form/task-form.component';
+import { SharedModule } from '../../shared/shared.module';
 
 
 @NgModule({
@@ -19,7 +21,9 @@ import { TaskFormComponent } from './components/task-form/task-form.component';
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
-    TasksRoutingModule
+    CommentsModule,
+    TasksRoutingModule,
+    SharedModule
   ],
   exports: [
     TaskListComponent,
