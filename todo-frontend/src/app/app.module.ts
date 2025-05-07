@@ -13,6 +13,7 @@ import { TasksModule } from './features/tasks/tasks.module';
 import { TaskListsModule } from './features/task-lists/task-lists.module';
 import { CategoriesModule } from './features/categories/categories.module';
 import { CommentsModule } from './features/comments/comments.module';
+import { AttachmentsModule } from './features/attachments/attachments.module';
 
 import { SharedModule } from './shared/shared.module';
 
@@ -28,6 +29,7 @@ import { TaskService } from './features/tasks/services/task.service';
 import { CategoryService } from './features/categories/services/category.service';
 import { TaskListService } from './features/task-lists/services/task-list.service';
 import { CommentService } from './features/comments/services/comment.service';
+import { AttachmentService } from './features/attachments/services/attachment.service';
 
 @NgModule({
   declarations: [
@@ -49,6 +51,7 @@ import { CommentService } from './features/comments/services/comment.service';
     TaskListsModule,
     CategoriesModule,
     CommentsModule,
+    AttachmentsModule,
     SharedModule
   ],
   providers: [
@@ -56,7 +59,8 @@ import { CommentService } from './features/comments/services/comment.service';
     TaskService,
     CategoryService,
     TaskListService,
-    CommentService
+    CommentService,
+    AttachmentService
   ],
   bootstrap: [AppComponent]
 })

@@ -1,0 +1,5 @@
+{
+   "project_name": "Employee Management System",
+    "project_description": "A web-based application to manage employee records, including personal details, job roles, attendance, salary, and performance reviews. The system provides role-based access for administrators, HR personnel, and employees, with features like employee registration, leave management, and report generation."
+   
+}

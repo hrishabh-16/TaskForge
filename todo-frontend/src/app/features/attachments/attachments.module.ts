@@ -14,6 +14,10 @@ import { AttachmentUploadComponent } from './components/attachment-upload/attach
   imports: [
     CommonModule,
     AttachmentsRoutingModule
+  ],
+  exports: [
+    AttachmentListComponent,
+    AttachmentUploadComponent
   ]
 })
 export class AttachmentsModule { }

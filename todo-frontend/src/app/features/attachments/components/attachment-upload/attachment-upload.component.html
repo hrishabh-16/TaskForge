@@ -1,1 +1,92 @@
-<p>attachment-upload works!</p>
+<!-- todo-frontend/src/app/features/attachments/components/attachment-upload/attachment-upload.component.html -->
+
+<div class="mt-4 mb-6">
+    <!-- Upload Button -->
+    <button 
+      *ngIf="!showUploadForm"
+      (click)="toggleUploadForm()" 
+      class="w-full flex justify-center items-center px-4 py-4 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition duration-150 ease-in-out"
+    >
+      <svg class="mr-2 h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+      </svg>
+      <span class="text-base font-medium">Add Attachment</span>
+    </button>
+  
+    <!-- Upload Form -->
+    <div *ngIf="showUploadForm" class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-base font-medium text-gray-900">Upload Attachment</h3>
+        <button (click)="toggleUploadForm()" class="text-gray-400 hover:text-gray-500">
+          <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Error message -->
+      <div *ngIf="error" class="mb-3 bg-red-100 border-l-4 border-red-500 text-red-700 p-3 text-sm rounded">
+        {{ error }}
+      </div>
+      
+      <!-- Success message -->
+      <div *ngIf="message" class="mb-3 bg-green-100 border-l-4 border-green-500 text-green-700 p-3 text-sm rounded">
+        {{ message }}
+      </div>
+  
+      <!-- File input -->
+      <div class="mb-3">
+        <div class="flex flex-col">
+          <label class="block mb-2 text-sm font-medium text-gray-700">
+            Select file to upload
+          </label>
+          <div class="flex items-center">
+            <label class="relative cursor-pointer bg-white rounded-md font-medium text-black hover:text-gray-700 focus-within:outline-none">
+              <input 
+                type="file" 
+                (change)="selectFile($event)" 
+                class="block w-full text-sm text-gray-500
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded file:border-0
+                  file:text-sm file:font-medium
+                  file:bg-gray-100 file:text-gray-700
+                  hover:file:bg-gray-200
+                  focus:outline-none"
+                [disabled]="isUploading"
+              >
+            </label>
+          </div>
+          <p class="mt-1 text-xs text-gray-500">
+            Files will be attached to this task and can be downloaded by anyone with access.
+          </p>
+        </div>
+      </div>
+      
+      <!-- Progress bar -->
+      <div *ngIf="isUploading" class="mb-3">
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+          <div class="bg-black h-2.5 rounded-full" [style.width]="progress + '%'"></div>
+        </div>
+        <p class="mt-1 text-xs text-gray-500">Uploading: {{ progress }}%</p>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="flex justify-end space-x-3">
+        <button 
+          type="button"
+          (click)="toggleUploadForm()" 
+          class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+          [disabled]="isUploading"
+        >
+          Cancel
+        </button>
+        <button 
+          *ngIf="selectedFiles && !isUploading" 
+          (click)="upload()" 
+          class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+        >
+          Upload
+        </button>
+      </div>
+    </div>
+  </div>

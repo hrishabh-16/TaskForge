@@ -7,6 +7,7 @@ import { TaskListComponent } from './components/task-list/task-list.component';
 import { TaskDetailComponent } from './components/task-detail/task-detail.component';
 import { CommentsModule } from '../comments/comments.module';
 import { TaskFormComponent } from './components/task-form/task-form.component';
+import { AttachmentsModule } from '../attachments/attachments.module';
 import { SharedModule } from '../../shared/shared.module';
 
 
@@ -23,6 +24,7 @@ import { SharedModule } from '../../shared/shared.module';
     RouterModule,
     CommentsModule,
     TasksRoutingModule,
+    AttachmentsModule,
     SharedModule
   ],
   exports: [
