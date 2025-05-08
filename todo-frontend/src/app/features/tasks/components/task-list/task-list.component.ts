@@ -13,8 +13,10 @@ import { catchError, finalize, of } from 'rxjs';
   styleUrls: ['./task-list.component.css']
 })
 export class TaskListComponent implements OnInit {
+  Math = Math;
   tasks: Task[] = [];
   filteredTasks: Task[] = [];
+  displayedTasks: Task[] = []; // Tasks displayed on current page
   isLoading = true;
   error = '';
   searchKeyword = '';
@@ -40,6 +42,11 @@ export class TaskListComponent implements OnInit {
   sortBy = 'dueDate';
   sortDirection = 'asc';
 
+  // Pagination
+  currentPage = 1;
+  pageSize = 5;
+  totalPages = 1;
+
   constructor(
     private taskService: TaskService,
     private taskListService: TaskListService,
@@ -53,6 +60,12 @@ export class TaskListComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       if (params['search']) {
         this.searchKeyword = params['search'];
+      }
+      
+      if (params['page'] && !isNaN(+params['page'])) {
+        this.currentPage = +params['page'];
+      } else {
+        this.currentPage = 1;
       }
       
       this.determineViewModeAndLoadTasks();
@@ -373,16 +386,91 @@ export class TaskListComponent implements OnInit {
     });
     
     this.filteredTasks = filtered;
+    
+    // Calculate total pages
+    this.totalPages = Math.max(1, Math.ceil(this.filteredTasks.length / this.pageSize));
+    
+    // Ensure current page is valid
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages;
+      this.updatePageInUrl(this.currentPage);
+    }
+    
+    // Apply pagination
+    this.updateDisplayedTasks();
+  }
+
+  updateDisplayedTasks(): void {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = Math.min(startIndex + this.pageSize, this.filteredTasks.length);
+    this.displayedTasks = this.filteredTasks.slice(startIndex, endIndex);
+  }
+  
+  // Pagination methods
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePageInUrl(page);
+      this.updateDisplayedTasks();
+    }
+  }
+  
+  goToFirstPage(): void {
+    this.goToPage(1);
+  }
+  
+  goToLastPage(): void {
+    this.goToPage(this.totalPages);
+  }
+  
+  goToPreviousPage(): void {
+    if (this.currentPage > 1) {
+      this.goToPage(this.currentPage - 1);
+    }
+  }
+  
+  goToNextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.goToPage(this.currentPage + 1);
+    }
+  }
+  
+  getDisplayedPageRange(): number[] {
+    // Calculate a range of pages to display (max 5 pages)
+    const totalPagesToShow = 5;
+    const pages: number[] = [];
+    
+    let startPage = Math.max(1, this.currentPage - Math.floor(totalPagesToShow / 2));
+    const endPage = Math.min(this.totalPages, startPage + totalPagesToShow - 1);
+    
+    // Adjust start page if we're near the end
+    startPage = Math.max(1, endPage - totalPagesToShow + 1);
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
+  }
+  
+  updatePageInUrl(page: number): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { page: page === 1 ? null : page },
+      queryParamsHandling: 'merge'
+    });
   }
   
   // Rest of the component methods remain unchanged
   setStatusFilter(status: string | null): void {
     this.statusFilter = status;
+    this.currentPage = 1; // Reset to first page when filtering
     this.applyFilters();
   }
   
   setPriorityFilter(priority: string | null): void {
     this.priorityFilter = priority;
+    this.currentPage = 1; // Reset to first page when filtering
     this.applyFilters();
   }
   
@@ -399,16 +487,18 @@ export class TaskListComponent implements OnInit {
   }
   
   search(): void {
+    this.currentPage = 1; // Reset to first page on search
     this.applyFilters();
   }
   
   clearSearch(): void {
     this.searchKeyword = '';
+    this.currentPage = 1; // Reset to first page
     this.applyFilters();
     // Also clear from URL
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { search: null },
+      queryParams: { search: null, page: null },
       queryParamsHandling: 'merge'
     });
   }
@@ -419,12 +509,13 @@ export class TaskListComponent implements OnInit {
     this.categoryFilter = null;
     this.taskListFilter = null;
     this.searchKeyword = '';
+    this.currentPage = 1; // Reset to first page
     this.applyFilters();
     
     // Clear search from URL
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { search: null },
+      queryParams: { search: null, page: null },
       queryParamsHandling: 'merge'
     });
   }
@@ -523,6 +614,7 @@ export class TaskListComponent implements OnInit {
   getPriorityClass(priority: string): string {
     switch(priority) {
       case 'HIGH':
+        return 'bg-orange-100 text-orange-800';
       case 'URGENT':
         return 'bg-red-100 text-red-800';
       case 'MEDIUM':

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { TaskListService } from '../../services/task-list.service';
 import { TaskListResponse } from '../../models/task-list.model';
 import { catchError, finalize, of } from 'rxjs';
@@ -11,19 +11,36 @@ import { catchError, finalize, of } from 'rxjs';
   styleUrls: ['./task-list-list.component.css']
 })
 export class TaskListListComponent implements OnInit {
+  Math = Math; // Expose Math for use in the template
   taskLists: TaskListResponse[] = [];
   filteredTaskLists: TaskListResponse[] = [];
+  displayedTaskLists: TaskListResponse[] = []; // Task lists displayed on current page
   isLoading = true;
   error = '';
   searchKeyword = '';
 
+  // Pagination
+  currentPage = 1;
+  pageSize = 5;
+  totalPages = 1;
+
   constructor(
     private taskListService: TaskListService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
-    this.loadTaskLists();
+    // Subscribe to query params for pagination
+    this.route.queryParams.subscribe(params => {
+      if (params['page'] && !isNaN(+params['page'])) {
+        this.currentPage = +params['page'];
+      } else {
+        this.currentPage = 1;
+      }
+      
+      this.loadTaskLists();
+    });
   }
 
   loadTaskLists(): void {
@@ -56,15 +73,102 @@ export class TaskListListComponent implements OnInit {
         (list.description && list.description.toLowerCase().includes(keyword))
       );
     }
+    
+    // Calculate total pages
+    this.totalPages = Math.max(1, Math.ceil(this.filteredTaskLists.length / this.pageSize));
+    
+    // Ensure current page is valid
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages;
+      this.updatePageInUrl(this.currentPage);
+    }
+    
+    // Apply pagination
+    this.updateDisplayedTaskLists();
+  }
+
+  updateDisplayedTaskLists(): void {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = Math.min(startIndex + this.pageSize, this.filteredTaskLists.length);
+    this.displayedTaskLists = this.filteredTaskLists.slice(startIndex, endIndex);
+  }
+  
+  // Pagination methods
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePageInUrl(page);
+      this.updateDisplayedTaskLists();
+    }
+  }
+  
+  goToFirstPage(): void {
+    this.goToPage(1);
+  }
+  
+  goToLastPage(): void {
+    this.goToPage(this.totalPages);
+  }
+  
+  goToPreviousPage(): void {
+    if (this.currentPage > 1) {
+      this.goToPage(this.currentPage - 1);
+    }
+  }
+  
+  goToNextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.goToPage(this.currentPage + 1);
+    }
+  }
+  
+  getDisplayedPageRange(): number[] {
+    // Calculate a range of pages to display (max 5 pages)
+    const totalPagesToShow = 5;
+    const pages: number[] = [];
+    
+    let startPage = Math.max(1, this.currentPage - Math.floor(totalPagesToShow / 2));
+    const endPage = Math.min(this.totalPages, startPage + totalPagesToShow - 1);
+    
+    // Adjust start page if we're near the end
+    startPage = Math.max(1, endPage - totalPagesToShow + 1);
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
+  }
+  
+  updatePageInUrl(page: number): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { page: page === 1 ? null : page },
+      queryParamsHandling: 'merge'
+    });
   }
   
   search(): void {
+    this.currentPage = 1; // Reset to first page on search
     this.applyFilter();
+    // Update URL
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { page: null },
+      queryParamsHandling: 'merge'
+    });
   }
   
   clearSearch(): void {
     this.searchKeyword = '';
+    this.currentPage = 1; // Reset to first page
     this.applyFilter();
+    // Update URL
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { page: null },
+      queryParamsHandling: 'merge'
+    });
   }
   
   createTaskList(): void {
