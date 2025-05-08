@@ -25,10 +25,7 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
 
-//    @Bean
-//    public ObjectMapper objectMapper() {
-//        return new ObjectMapper();
-//    }
+
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
