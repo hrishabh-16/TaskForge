@@ -51,13 +51,7 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private NotificationService notificationService;
 
-//    @Override
-//    public TaskResponse createTask(TaskRequest taskRequest) {
-//        User currentUser = getCurrentUser();
-//        Task task = taskMapper.toTask(taskRequest, currentUser);
-//        task = taskRepository.save(task);
-//        return taskMapper.toTaskResponse(task);
-//    }
+
     	
     @Override
     public TaskResponse createTask(TaskRequest taskRequest) {
@@ -147,22 +141,7 @@ public class TaskServiceImpl implements TaskService {
         return taskMapper.toTaskResponseList(tasks);
     }
 
-//    @Override
-//    public void deleteTask(Long taskId) {
-//        Task task = taskRepository.findById(taskId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
-//
-//        
-//        // Verify that the task belongs to the current user
-//        User currentUser = getCurrentUser();
-//        if (!task.getUser().getId().equals(currentUser.getId())) {
-//        	throw new UnauthorizedException("You don't have permission to update this task");
-//
-//        }
-//        
-//        taskRepository.delete(task);
-//    }
-    
+
     @Override
     public void deleteTask(Long taskId) {
         Task task = taskRepository.findById(taskId)
@@ -183,24 +162,6 @@ public class TaskServiceImpl implements TaskService {
         messagingTemplate.convertAndSend("/topic/tasks", deleteNotification);
     }
 
-//    @Override
-//    public TaskResponse markTaskAsCompleted(Long taskId) {
-//        Task task = taskRepository.findById(taskId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
-//
-//        
-//        // Verify that the task belongs to the current user
-//        User currentUser = getCurrentUser();
-//        if (!task.getUser().getId().equals(currentUser.getId())) {
-//        	throw new UnauthorizedException("You don't have permission to update this task");
-//
-//        }
-//        
-//        task.setStatus(TaskStatus.COMPLETED);
-//        task.setCompletedAt(LocalDateTime.now());
-//        task = taskRepository.save(task);
-//        return taskMapper.toTaskResponse(task);
-//    }
     
     @Override
     public TaskResponse markTaskAsCompleted(Long taskId) {
