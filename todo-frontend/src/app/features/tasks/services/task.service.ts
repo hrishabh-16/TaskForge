@@ -127,10 +127,15 @@ export class TaskService {
       .pipe(catchError(this.handleError));
   }
   
-  // Search tasks
+  // Search tasks (case-sensitive)
   searchTasks(keyword: string): Observable<TaskResponse[]> {
-    return this.http.get<TaskResponse[]>(`${this.apiUrl}/search?keyword=${keyword}`)
-      .pipe(catchError(this.handleError));
+    return this.http.get<TaskResponse[]>(`${this.apiUrl}`).pipe(
+      map(tasks => tasks.filter(task => 
+        task.title.includes(keyword) || 
+        (task.description && task.description.includes(keyword))
+      )),
+      catchError(this.handleError)
+    );
   }
   
   // Get tasks by status

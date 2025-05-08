@@ -7,6 +7,7 @@ import { ClickOutsideDirective } from './directives/click-outside.directive';
 import { HighlightDirective } from './directives/highlight.directive';
 import { DateFormatPipe } from './pipes/date-format.pipe';
 import { FilterPipe } from './pipes/filter.pipe';
+import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 
@@ -23,7 +24,8 @@ import { RouterModule } from '@angular/router';
   ],
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
+    FormsModule
   ],
   exports: [
     HeaderComponent,

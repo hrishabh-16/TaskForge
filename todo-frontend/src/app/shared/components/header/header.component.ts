@@ -1,10 +1,10 @@
-// todo-frontend/src/app/shared/components/header/header.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { NotificationService } from '../../../features/notifications/services/notification.service';
 import { Notification } from '../../../features/notifications/models/notification.model';
+import { TaskService } from '../../../features/tasks/services/task.service';
 
 @Component({
   selector: 'app-header',
@@ -19,11 +19,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
   notifications: Notification[] = [];
   unreadCount: number = 0;
   loadingNotifications: boolean = false;
+  searchQuery: string = '';
   private subscription: Subscription = new Subscription();
   
   constructor(
     private authService: AuthService,
     private notificationService: NotificationService,
+    private taskService: TaskService,
     private router: Router
   ) { }
 
@@ -173,6 +175,22 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
     
     return date.toLocaleDateString();
+  }
+
+  // Search functionality
+  searchTasks(event: Event): void {
+    event.preventDefault();
+    if (this.searchQuery.trim()) {
+      this.router.navigate(['/tasks'], { 
+        queryParams: { 
+          search: this.searchQuery 
+        }
+      });
+    }
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
   }
 
   logout(): void {

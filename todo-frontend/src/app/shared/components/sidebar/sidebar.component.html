@@ -143,10 +143,12 @@
             <div *ngIf="error" class="px-2 py-2 text-sm text-red-500">
               {{ error }}
             </div>
-            <div *ngIf="!isLoading && !error && taskLists.length === 0" class="px-2 py-2 text-sm text-gray-500">
+            <div *ngIf="!isLoading && !error && topTaskLists.length === 0" class="px-2 py-2 text-sm text-gray-500">
               No projects found
             </div>
-            <a *ngFor="let list of taskLists" (click)="navigateTo('/task-lists/' + list.id)" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+            
+            <!-- Show top 2 task lists with most tasks -->
+            <a *ngFor="let list of topTaskLists" (click)="navigateTo('/task-lists/' + list.id)" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
               <span class="truncate">{{ list.name }}</span>
               <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
                 {{ list.taskCount }}
@@ -195,10 +197,12 @@
             <div *ngIf="error" class="px-2 py-2 text-sm text-red-500">
               {{ error }}
             </div>
-            <div *ngIf="!isLoading && !error && categories.length === 0" class="px-2 py-2 text-sm text-gray-500">
+            <div *ngIf="!isLoading && !error && topCategories.length === 0" class="px-2 py-2 text-sm text-gray-500">
               No categories found
             </div>
-            <a *ngFor="let category of categories" (click)="navigateTo('/categories/' + category.id)" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+            
+            <!-- Show top 2 categories with most tasks -->
+            <a *ngFor="let category of topCategories" (click)="navigateTo('/categories/' + category.id)" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
               <span class="truncate">{{ category.name }}</span>
               <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
                 {{ category.taskCount }}
@@ -364,10 +368,12 @@
           <div *ngIf="error" class="px-2 py-2 text-xs text-red-500">
             {{ error }}
           </div>
-          <div *ngIf="!isLoading && !error && taskLists.length === 0" class="px-2 py-2 text-xs text-gray-500">
+          <div *ngIf="!isLoading && !error && topTaskLists.length === 0" class="px-2 py-2 text-xs text-gray-500">
             No projects found
           </div>
-          <a *ngFor="let list of taskLists" (click)="navigateTo('/task-lists/' + list.id)" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+          
+          <!-- Show top 2 task lists with most tasks -->
+          <a *ngFor="let list of topTaskLists" (click)="navigateTo('/task-lists/' + list.id)" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
             <span class="truncate">{{ list.name }}</span>
             <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
               {{ list.taskCount }}
@@ -380,6 +386,7 @@
             <span class="truncate text-gray-500">Add Project</span>
           </a>
         </div>
+        
       </div>
       
       <!-- Calendar View -->
@@ -416,10 +423,12 @@
           <div *ngIf="error" class="px-2 py-2 text-xs text-red-500">
             {{ error }}
           </div>
-          <div *ngIf="!isLoading && !error && categories.length === 0" class="px-2 py-2 text-xs text-gray-500">
+          <div *ngIf="!isLoading && !error && topCategories.length === 0" class="px-2 py-2 text-xs text-gray-500">
             No categories found
           </div>
-          <a *ngFor="let category of categories" (click)="navigateTo('/categories/' + category.id)" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
+          
+          <!-- Show top 2 categories with most tasks -->
+          <a *ngFor="let category of topCategories" (click)="navigateTo('/categories/' + category.id)" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition duration-150">
             <span class="truncate">{{ category.name }}</span>
             <span class="ml-auto inline-block py-0.5 px-2 text-xs rounded-full bg-gray-200">
               {{ category.taskCount }}

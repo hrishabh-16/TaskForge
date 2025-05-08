@@ -1,4 +1,3 @@
-// src/app/features/tasks/components/task-list/task-list.component.ts
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TaskService } from '../../services/task.service';
@@ -50,7 +49,14 @@ export class TaskListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.determineViewModeAndLoadTasks();
+    // Subscribe to query params for search term from header
+    this.route.queryParams.subscribe(params => {
+      if (params['search']) {
+        this.searchKeyword = params['search'];
+      }
+      
+      this.determineViewModeAndLoadTasks();
+    });
   }
 
   determineViewModeAndLoadTasks(): void {
@@ -322,12 +328,12 @@ export class TaskListComponent implements OnInit {
       filtered = filtered.filter(task => task.taskListId === this.taskListFilter);
     }
     
-    // Apply search
+    // Apply search (case-sensitive as per requirements)
     if (this.searchKeyword) {
-      const keyword = this.searchKeyword.toLowerCase();
+      const keyword = this.searchKeyword; // Case-sensitive search
       filtered = filtered.filter(task => 
-        task.title.toLowerCase().includes(keyword) || 
-        (task.description && task.description.toLowerCase().includes(keyword))
+        task.title.includes(keyword) || 
+        (task.description && task.description.includes(keyword))
       );
     }
     
@@ -399,6 +405,12 @@ export class TaskListComponent implements OnInit {
   clearSearch(): void {
     this.searchKeyword = '';
     this.applyFilters();
+    // Also clear from URL
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { search: null },
+      queryParamsHandling: 'merge'
+    });
   }
   
   clearFilters(): void {
@@ -408,6 +420,13 @@ export class TaskListComponent implements OnInit {
     this.taskListFilter = null;
     this.searchKeyword = '';
     this.applyFilters();
+    
+    // Clear search from URL
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { search: null },
+      queryParamsHandling: 'merge'
+    });
   }
   
   refreshTasks(): void {

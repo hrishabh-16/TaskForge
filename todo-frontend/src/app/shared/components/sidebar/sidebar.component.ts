@@ -1,4 +1,3 @@
-// src/app/shared/components/sidebar/sidebar.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CategoryService } from '../../../features/categories/services/category.service';
@@ -16,6 +15,8 @@ export class SidebarComponent implements OnInit {
   isSidebarCollapsed = false; // Desktop sidebar collapse state
   categories: any[] = [];
   taskLists: any[] = [];
+  topCategories: any[] = []; // Categories with most tasks
+  topTaskLists: any[] = []; // Task lists with most tasks
   isLoading = false;
   error = '';
   
@@ -51,6 +52,12 @@ export class SidebarComponent implements OnInit {
     this.categoryService.getCategories().subscribe({
       next: (data) => {
         this.categories = data;
+        
+        // Sort categories by task count and get top 2
+        this.topCategories = [...this.categories]
+          .sort((a, b) => (b.taskCount || 0) - (a.taskCount || 0))
+          .slice(0, 2);
+          
         this.isLoading = false;
       },
       error: (err) => {
@@ -64,6 +71,12 @@ export class SidebarComponent implements OnInit {
     this.taskListService.getTaskLists().subscribe({
       next: (data) => {
         this.taskLists = data;
+        
+        // Sort task lists by task count and get top 2
+        this.topTaskLists = [...this.taskLists]
+          .sort((a, b) => (b.taskCount || 0) - (a.taskCount || 0))
+          .slice(0, 2);
+          
         this.isLoading = false;
       },
       error: (err) => {
