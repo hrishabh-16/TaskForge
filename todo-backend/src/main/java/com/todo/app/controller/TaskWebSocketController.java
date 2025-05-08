@@ -1,4 +1,3 @@
-// todo-backend/src/main/java/com/todo/app/controller/TaskWebSocketController.java
 package com.todo.app.controller;
 
 import com.todo.app.model.dto.response.TaskResponse;

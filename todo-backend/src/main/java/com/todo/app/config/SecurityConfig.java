@@ -51,11 +51,13 @@ public class SecurityConfig {
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-            		 // Public endpoints
+                    // Public endpoints
                     .requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers("/api/test/**").permitAll()
                     .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                     .requestMatchers("/error").permitAll()
+                    // WebSocket endpoint - ADDED THIS LINE TO FIX THE 401 ERROR
+                    .requestMatchers("/ws/**").permitAll()
                     
                     // User endpoints - require authentication
                     .requestMatchers("/api/users/me").authenticated()
@@ -80,7 +82,7 @@ public class SecurityConfig {
                     //Notification endpoints - require authentication
                     .requestMatchers("/api/notifications/**").authenticated()
                     
-                 // Inside the filterChain method, add this line to the authorizeHttpRequests section:
+                    // Inside the filterChain method, add this line to the authorizeHttpRequests section:
                     .requestMatchers("/api/auth/forgot-password", "/api/auth/reset-password").permitAll()
                     
                     // All other requests require authentication

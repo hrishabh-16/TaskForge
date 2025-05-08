@@ -24,16 +24,23 @@ export class WebSocketService {
       }
     });
   }
+
   connect(): void {
     try {
       if (typeof SockJS !== 'undefined') {
         const socket = new SockJS('http://localhost:4000/ws');
         this.stompClient = Stomp.over(socket);
         
+        // Set debug to false to reduce console noise
+        this.stompClient.debug = null;
+        
         const that = this;
-        this.stompClient.connect({}, function() {
+        // Add authentication headers to the WebSocket connection
+        const headers = this.getAuthHeaders();
+        
+        this.stompClient.connect(headers, function() {
           that.connectedSubject.next(true);
-        }, this.onError);
+        }, this.onErrorCallback.bind(this)); // Fix: Bind 'this' to maintain context
       } else {
         console.warn('SockJS not loaded. WebSocket connection not established.');
       }
@@ -42,16 +49,24 @@ export class WebSocketService {
     }
   }
 
+  // Helper method to get auth headers
+  private getAuthHeaders(): any {
+    const token = localStorage.getItem('token');
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
+  }
+
   disconnect(): void {
-    if (this.stompClient !== null) {
+    if (this.stompClient !== null && this.stompClient.connected) {
       this.stompClient.disconnect();
       this.connectedSubject.next(false);
     }
   }
 
-  onError(error: any): void {
+  // Fix: Create a separate method for error callback to preserve 'this' context
+  private onErrorCallback(error: any): void {
     console.error('WebSocket Connection Error:', error);
-    // Implement retry logic here if needed
+    this.connectedSubject.next(false);
+    // Implement retry logic with proper 'this' binding
     setTimeout(() => {
       this.connect();
     }, 5000);

@@ -42,14 +42,20 @@ export class NotificationService {
         const socket = new SockJS('http://localhost:4000/ws');
         this.stompClient = Stomp.over(socket);
         
+        // Set debug to false to reduce console noise
+        this.stompClient.debug = null;
+        
         const that = this;
-        this.stompClient.connect({}, function() {
+        // Add authentication headers to the WebSocket connection
+        const headers = this.getAuthHeaders();
+        
+        this.stompClient.connect(headers, function() {
           // Subscribe to personal notifications channel
           that.stompClient.subscribe('/user/queue/notifications', (notification: any) => {
             const newNotification = JSON.parse(notification.body);
             that.addNotification(newNotification);
           });
-        }, this.onError);
+        }, this.onErrorCallback.bind(this)); // Fix: Bind 'this' to maintain context
       } else {
         console.warn('SockJS not loaded. WebSocket connection not established.');
       }
@@ -57,15 +63,23 @@ export class NotificationService {
       console.error('Error connecting to WebSocket:', error);
     }
   }
+
+  // Helper method to get auth headers
+  private getAuthHeaders(): any {
+    const token = localStorage.getItem('token');
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
+  }
+  
   disconnect(): void {
-    if (this.stompClient !== null) {
+    if (this.stompClient !== null && this.stompClient.connected) {
       this.stompClient.disconnect();
     }
   }
 
-  onError(error: any): void {
+  // Fix: Create a separate method for error callback to preserve 'this' context
+  private onErrorCallback(error: any): void {
     console.error('WebSocket Connection Error:', error);
-    // Implement retry logic here if needed
+    // Implement retry logic with proper 'this' binding
     setTimeout(() => {
       this.connect();
     }, 5000);
