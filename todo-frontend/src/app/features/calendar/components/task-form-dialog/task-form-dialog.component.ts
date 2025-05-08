@@ -72,7 +72,15 @@ export class TaskFormDialogComponent implements OnInit {
   onSubmit(): void {
     if (this.taskForm.valid) {
       this.loading = true;
-      const taskData = this.taskForm.value;
+      const taskData = { ...this.taskForm.value };
+      
+      // Ensure dueDate has the correct format with seconds
+      if (taskData.dueDate) {
+        // If dueDate doesn't already have seconds, add them
+        if (taskData.dueDate.length === 16) {
+          taskData.dueDate = `${taskData.dueDate}:00`;
+        }
+      }
       
       this.taskService.createTask(taskData).subscribe(
         (response) => {
@@ -97,8 +105,10 @@ export class TaskFormDialogComponent implements OnInit {
     const day = this.padZero(date.getDate());
     const hours = this.padZero(date.getHours());
     const minutes = this.padZero(date.getMinutes());
+    const seconds = this.padZero(date.getSeconds());
     
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    // Include seconds in the formatted datetime string
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
   }
 
   private padZero(num: number): string {
