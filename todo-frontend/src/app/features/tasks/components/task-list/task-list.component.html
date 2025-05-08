@@ -28,46 +28,71 @@
           <div class="relative rounded-md shadow-sm">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                <path fill-rule="evenodd"
+                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                  clip-rule="evenodd" />
               </svg>
             </div>
-            <input [(ngModel)]="searchKeyword" (keyup.enter)="search()" type="text" class="block w-full pl-10 pr-10 py-2 text-sm border-gray-300 rounded-md focus:ring-black focus:border-black" placeholder="Search tasks...">
-            <div *ngIf="searchKeyword" class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" (click)="clearSearch()">
-              <svg class="h-5 w-5 text-gray-400 hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            <input [(ngModel)]="searchKeyword" (keyup.enter)="search()" type="text"
+              class="block w-full pl-10 pr-10 py-2 text-sm border-gray-300 rounded-md focus:ring-black focus:border-black"
+              placeholder="Search tasks...">
+            <div *ngIf="searchKeyword" class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+              (click)="clearSearch()">
+              <svg class="h-5 w-5 text-gray-400 hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clip-rule="evenodd" />
               </svg>
             </div>
           </div>
         </div>
-        
-        <!-- Filter Dropdowns -->
-        <div class="flex items-center space-x-3 flex-shrink-0">
-          <!-- Status Filter -->
-          <select [(ngModel)]="statusFilter" (change)="applyFilters()" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-black focus:border-black sm:text-sm rounded-md">
-            <option [ngValue]="null">All Statuses</option>
-            <option value="PENDING">Pending</option>
-            <option value="IN_PROGRESS">In Progress</option>
-            <option value="COMPLETED">Completed</option>
-            <option value="ON_HOLD">On Hold</option>
-            <option value="CANCELLED">Cancelled</option>
-          </select>
-          
-          <!-- Priority Filter -->
-          <select [(ngModel)]="priorityFilter" (change)="applyFilters()" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-black focus:border-black sm:text-sm rounded-md">
-            <option [ngValue]="null">All Priorities</option>
-            <option value="LOW">Low</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="HIGH">High</option>
-            <option value="URGENT">Urgent</option>
-          </select>
-          
-          <!-- Clear Filters Button -->
-          <button (click)="clearFilters()" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition duration-150 ease-in-out">
-            <svg class="-ml-0.5 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-            Clear
-          </button>
+    
+        <!-- Filter Section -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-end gap-3 mb-6">
+          <!-- Filter Dropdowns Container -->
+          <div class="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3 flex-grow">
+            <!-- Status Filter -->
+            <div class="relative w-full sm:w-auto min-w-[180px]">
+              <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <select id="status-filter" [(ngModel)]="statusFilter" (change)="applyFilters()"
+                class="block w-full pl-3 pr-10 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition duration-150">
+                <option [ngValue]="null">All Statuses</option>
+                <option value="PENDING">Pending</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="ON_HOLD">On Hold</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+    
+            <!-- Priority Filter -->
+            <div class="relative w-full sm:w-auto min-w-[180px]">
+              <label for="priority-filter" class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+              <select id="priority-filter" [(ngModel)]="priorityFilter" (change)="applyFilters()"
+                class="block w-full pl-3 pr-10 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition duration-150">
+                <option [ngValue]="null">All Priorities</option>
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+                <option value="URGENT">Urgent</option>
+              </select>
+            </div>
+          </div>
+    
+          <!-- Clear Filters Button - Now perfectly aligned -->
+          <div class="w-full sm:w-auto mt-2 sm:mt-0">
+            <button (click)="clearFilters()"
+              class="h-[42px] inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all duration-150">
+              <svg class="-ml-1 mr-2 h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clip-rule="evenodd" />
+              </svg>
+              Clear Filters
+            </button>
+          </div>
         </div>
       </div>
     </div>
