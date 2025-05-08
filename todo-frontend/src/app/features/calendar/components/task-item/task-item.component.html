@@ -1,0 +1,53 @@
+<!-- todo-frontend/src/app/features/calendar/components/task-item/task-item.component.html -->
+<div class="group p-3 border rounded cursor-pointer transition-all duration-200 ease-in-out hover:shadow"
+     [ngClass]="statusColor"
+     (click)="onTaskClick()">
+  <div class="flex items-start justify-between">
+    <div class="flex-1 mr-2">
+      <div class="flex items-center">
+        <h4 class="text-sm font-medium text-gray-900" [ngClass]="{'line-through opacity-70': task.status === 'COMPLETED'}">{{ task.title }}</h4>
+        <span *ngIf="task.priority" 
+              class="ml-2 px-2 py-0.5 text-xs rounded-full"
+              [ngClass]="priorityBadge">
+          {{ task.priority }}
+        </span>
+      </div>
+      
+      <p *ngIf="task.description" class="mt-1 text-xs text-gray-600 line-clamp-2">{{ task.description }}</p>
+      
+      <div class="mt-1 flex items-center text-xs text-gray-500">
+        <span class="flex items-center" *ngIf="task.dueDate">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          {{ formatTime(task.dueDate) }}
+        </span>
+        
+        <span class="flex items-center ml-3" *ngIf="task.categoryName">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+          </svg>
+          {{ task.categoryName }}
+        </span>
+      </div>
+    </div>
+    
+    <div>
+      <button 
+        *ngIf="task.status !== 'COMPLETED'"
+        (click)="onCompleteClick($event)" 
+        class="p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-gray-200 focus:outline-none"
+        title="Mark as completed"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+      </button>
+      <div *ngIf="task.status === 'COMPLETED'" class="p-1 rounded-full bg-green-500 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>

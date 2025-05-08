@@ -1,0 +1,67 @@
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <!-- Calendar Grid -->
+    <div class="bg-white">
+      <!-- Day names header -->
+      <div class="grid grid-cols-7 border-b border-gray-200">
+        <div class="py-3 text-center text-sm font-medium text-gray-500">Sun</div>
+        <div class="py-3 text-center text-sm font-medium text-gray-500">Mon</div>
+        <div class="py-3 text-center text-sm font-medium text-gray-500">Tue</div>
+        <div class="py-3 text-center text-sm font-medium text-gray-500">Wed</div>
+        <div class="py-3 text-center text-sm font-medium text-gray-500">Thu</div>
+        <div class="py-3 text-center text-sm font-medium text-gray-500">Fri</div>
+        <div class="py-3 text-center text-sm font-medium text-gray-500">Sat</div>
+      </div>
+      
+      <div class="divide-y divide-gray-200">
+        <!-- Weeks -->
+        <div *ngFor="let week of weeks" class="divide-x divide-gray-200">
+          <div class="grid grid-cols-7 min-h-[120px]">
+            <!-- Days in week -->
+            <div *ngFor="let day of week" 
+                 class="p-2 relative min-h-[120px] border-b border-r border-gray-200"
+                 [ngClass]="{
+                   'bg-blue-50': day.isToday,
+                   'bg-gray-50': !day.isCurrentMonth,
+                   'bg-white': day.isCurrentMonth && !day.isToday
+                 }">
+              <!-- Day number -->
+              <div class="flex justify-between items-start">
+                <span class="text-sm font-medium"
+                      [ngClass]="{
+                        'text-blue-600': day.isToday,
+                        'text-gray-900': day.isCurrentMonth && !day.isToday,
+                        'text-gray-400': !day.isCurrentMonth
+                      }">
+                  {{ day.dayNumber }}
+                </span>
+                
+                <!-- More indicator for days with many events -->
+                <span *ngIf="day.events.length > 3" class="text-xs text-gray-500 bg-gray-100 rounded-full px-1.5 py-0.5">
+                  {{ day.events.length }}
+                </span>
+              </div>
+              
+              <!-- Tasks for this day (max 3 visible) -->
+              <div class="mt-1 space-y-1 overflow-hidden">
+                <div *ngFor="let event of day.events.slice(0, 3)"
+                     (click)="onTaskClick(event)"
+                     class="text-xs p-1 rounded border cursor-pointer truncate"
+                     [ngClass]="getTaskStatusClass(event.meta.task)">
+                  {{ event.title }}
+                </div>
+              </div>
+              
+              <!-- Dot indicators for events beyond the first 3 -->
+              <div *ngIf="day.events.length > 3" class="absolute bottom-1 left-0 right-0 flex justify-center">
+                <div class="flex space-x-1">
+                  <div class="w-1 h-1 rounded-full bg-gray-400"></div>
+                  <div class="w-1 h-1 rounded-full bg-gray-400"></div>
+                  <div class="w-1 h-1 rounded-full bg-gray-400"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

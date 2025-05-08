@@ -15,6 +15,7 @@ import com.todo.app.service.interfaces.EmailService;
 import com.todo.app.service.interfaces.NotificationService;
 import com.todo.app.service.interfaces.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -40,19 +43,35 @@ public class TaskServiceImpl implements TaskService {
     private TaskMapper taskMapper;
     
     @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+    
+    @Autowired
     private EmailService emailService;
 
     @Autowired
     private NotificationService notificationService;
 
+//    @Override
+//    public TaskResponse createTask(TaskRequest taskRequest) {
+//        User currentUser = getCurrentUser();
+//        Task task = taskMapper.toTask(taskRequest, currentUser);
+//        task = taskRepository.save(task);
+//        return taskMapper.toTaskResponse(task);
+//    }
+    	
     @Override
     public TaskResponse createTask(TaskRequest taskRequest) {
         User currentUser = getCurrentUser();
         Task task = taskMapper.toTask(taskRequest, currentUser);
         task = taskRepository.save(task);
-        return taskMapper.toTaskResponse(task);
+        
+        // Send WebSocket notification
+        TaskResponse taskResponse = taskMapper.toTaskResponse(task);
+        messagingTemplate.convertAndSend("/topic/tasks", taskResponse);
+        
+        return taskResponse;
     }
-
+    
     @Override
     public TaskResponse updateTask(Long taskId, TaskRequest taskRequest) {
         Task task = taskRepository.findById(taskId)
@@ -73,6 +92,9 @@ public class TaskServiceImpl implements TaskService {
         }
         
         task = taskRepository.save(task);
+        TaskResponse taskResponse = taskMapper.toTaskResponse(task);
+        messagingTemplate.convertAndSend("/topic/tasks", taskResponse);
+
         
         // Send notification if status changed
         if (statusChanged) {
@@ -125,39 +147,81 @@ public class TaskServiceImpl implements TaskService {
         return taskMapper.toTaskResponseList(tasks);
     }
 
+//    @Override
+//    public void deleteTask(Long taskId) {
+//        Task task = taskRepository.findById(taskId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
+//
+//        
+//        // Verify that the task belongs to the current user
+//        User currentUser = getCurrentUser();
+//        if (!task.getUser().getId().equals(currentUser.getId())) {
+//        	throw new UnauthorizedException("You don't have permission to update this task");
+//
+//        }
+//        
+//        taskRepository.delete(task);
+//    }
+    
     @Override
     public void deleteTask(Long taskId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
-
         
         // Verify that the task belongs to the current user
         User currentUser = getCurrentUser();
         if (!task.getUser().getId().equals(currentUser.getId())) {
-        	throw new UnauthorizedException("You don't have permission to update this task");
-
+            throw new UnauthorizedException("You don't have permission to update this task");
         }
         
         taskRepository.delete(task);
+        
+        // Send WebSocket notification for deletion
+        Map<String, Object> deleteNotification = new HashMap<>();
+        deleteNotification.put("action", "delete");
+        deleteNotification.put("taskId", taskId);
+        messagingTemplate.convertAndSend("/topic/tasks", deleteNotification);
     }
 
+//    @Override
+//    public TaskResponse markTaskAsCompleted(Long taskId) {
+//        Task task = taskRepository.findById(taskId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
+//
+//        
+//        // Verify that the task belongs to the current user
+//        User currentUser = getCurrentUser();
+//        if (!task.getUser().getId().equals(currentUser.getId())) {
+//        	throw new UnauthorizedException("You don't have permission to update this task");
+//
+//        }
+//        
+//        task.setStatus(TaskStatus.COMPLETED);
+//        task.setCompletedAt(LocalDateTime.now());
+//        task = taskRepository.save(task);
+//        return taskMapper.toTaskResponse(task);
+//    }
+    
     @Override
     public TaskResponse markTaskAsCompleted(Long taskId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
-
         
         // Verify that the task belongs to the current user
         User currentUser = getCurrentUser();
         if (!task.getUser().getId().equals(currentUser.getId())) {
-        	throw new UnauthorizedException("You don't have permission to update this task");
-
+            throw new UnauthorizedException("You don't have permission to update this task");
         }
         
         task.setStatus(TaskStatus.COMPLETED);
         task.setCompletedAt(LocalDateTime.now());
         task = taskRepository.save(task);
-        return taskMapper.toTaskResponse(task);
+        
+        // Send WebSocket notification
+        TaskResponse taskResponse = taskMapper.toTaskResponse(task);
+        messagingTemplate.convertAndSend("/topic/tasks", taskResponse);
+        
+        return taskResponse;
     }
 
     @Override

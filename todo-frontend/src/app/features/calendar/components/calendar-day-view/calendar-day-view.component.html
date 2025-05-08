@@ -1,0 +1,88 @@
+<!-- todo-frontend/src/app/features/calendar/components/calendar-day-view/calendar-day-view.component.html -->
+<div class="bg-white rounded-lg shadow overflow-hidden">
+  <div class="p-6 border-b border-gray-200">
+    <h3 class="text-xl font-semibold text-gray-900">
+      {{ viewDate | date:'EEEE, MMMM d, y' }}
+    </h3>
+  </div>
+  
+  <div class="p-6">
+    <!-- No tasks placeholder -->
+    <div *ngIf="dayTasks.length === 0" class="text-center py-12">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      <h3 class="mt-4 text-lg font-medium text-gray-900">No tasks for today</h3>
+      <p class="mt-1 text-gray-500">Create a new task to get started with your day.</p>
+    </div>
+    
+    <!-- Task list -->
+    <div *ngIf="dayTasks.length > 0" class="space-y-3">
+      <div *ngFor="let task of dayTasks" 
+           (click)="onTaskClick(task)"
+           class="group p-4 border rounded-lg cursor-pointer transition-all duration-200 ease-in-out hover:shadow-md"
+           [ngClass]="{
+             'bg-red-50 border-red-200': task.status !== 'COMPLETED' && isOverdue(task),
+             'bg-yellow-50 border-yellow-200': task.status === 'PENDING' && !isOverdue(task),
+             'bg-blue-50 border-blue-200': task.status === 'IN_PROGRESS',
+             'bg-green-50 border-green-200': task.status === 'COMPLETED',
+             'bg-purple-50 border-purple-200': task.status === 'ON_HOLD'
+           }">
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <div class="flex items-center">
+              <h4 class="text-base font-medium text-gray-900" [ngClass]="{'line-through opacity-70': task.status === 'COMPLETED'}">{{ task.title }}</h4>
+              <span *ngIf="task.priority" 
+                    class="ml-2 px-2 py-0.5 text-xs font-medium rounded-full"
+                    [ngClass]="{
+                      'bg-red-100 text-red-800': task.priority === 'HIGH',
+                      'bg-yellow-100 text-yellow-800': task.priority === 'MEDIUM',
+                      'bg-green-100 text-green-800': task.priority === 'LOW'
+                    }">
+                {{ task.priority }}
+              </span>
+            </div>
+            
+            <p *ngIf="task.description" class="mt-1 text-sm text-gray-600 line-clamp-2">{{ task.description }}</p>
+            
+            <div class="mt-2 flex items-center text-xs text-gray-500">
+              <span class="flex items-center" *ngIf="task.dueDate">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {{ formatTime(task.dueDate) }}
+              </span>
+              
+              <span class="flex items-center ml-4" *ngIf="task.categoryName">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+                {{ task.categoryName }}
+              </span>
+              
+              <span class="flex items-center ml-4" *ngIf="task.taskListName">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                {{ task.taskListName }}
+              </span>
+            </div>
+          </div>
+          
+          <div>
+            <div class="px-2 py-1 text-xs font-medium rounded"
+                 [ngClass]="{
+                   'bg-red-100 text-red-800': task.status !== 'COMPLETED' && isOverdue(task),
+                   'bg-yellow-100 text-yellow-800': task.status === 'PENDING' && !isOverdue(task),
+                   'bg-blue-100 text-blue-800': task.status === 'IN_PROGRESS',
+                   'bg-green-100 text-green-800': task.status === 'COMPLETED',
+                   'bg-purple-100 text-purple-800': task.status === 'ON_HOLD'
+                 }">
+              {{ task.status === 'PENDING' && isOverdue(task) ? 'OVERDUE' : task.status }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

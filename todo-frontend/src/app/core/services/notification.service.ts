@@ -37,19 +37,26 @@ export class NotificationService {
   }
 
   connect(): void {
-    const socket = new SockJS('http://localhost:4000/ws');
-    this.stompClient = Stomp.over(socket);
-    
-    const that = this;
-    this.stompClient.connect({}, function() {
-      // Subscribe to personal notifications channel
-      that.stompClient.subscribe('/user/queue/notifications', (notification: any) => {
-        const newNotification = JSON.parse(notification.body);
-        that.addNotification(newNotification);
-      });
-    }, this.onError);
+    try {
+      if (typeof SockJS !== 'undefined') {
+        const socket = new SockJS('http://localhost:4000/ws');
+        this.stompClient = Stomp.over(socket);
+        
+        const that = this;
+        this.stompClient.connect({}, function() {
+          // Subscribe to personal notifications channel
+          that.stompClient.subscribe('/user/queue/notifications', (notification: any) => {
+            const newNotification = JSON.parse(notification.body);
+            that.addNotification(newNotification);
+          });
+        }, this.onError);
+      } else {
+        console.warn('SockJS not loaded. WebSocket connection not established.');
+      }
+    } catch (error) {
+      console.error('Error connecting to WebSocket:', error);
+    }
   }
-
   disconnect(): void {
     if (this.stompClient !== null) {
       this.stompClient.disconnect();

@@ -22,7 +22,11 @@ import { AttachmentsModule } from './features/attachments/attachments.module';
 import { ProfileModule } from './features/profile/profile.module';
 import { NotificationsModule } from './features/notifications/notifications.module';
 import { SettingsModule } from './features/settings/settings.module';
+import { CalendarModule } from './features/calendar/calendar.module';
 import { SharedModule } from './shared/shared.module';
+
+// Material Design modules for dialogs
+import { MatDialogModule } from '@angular/material/dialog';
 
 // Auth Components (since they're not declared in AuthModule yet)
 import { LoginComponent } from './features/auth/components/login/login.component';
@@ -41,13 +45,15 @@ import { ProfileService } from './features/profile/services/profile.service';
 import { SettingsService } from './features/settings/services/settings.service';
 
 
+
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     RegisterComponent,  
     ForgotPasswordComponent,
-    ResetPasswordComponent
+    ResetPasswordComponent,
+    
   ],
   imports: [
     BrowserModule,
@@ -72,6 +78,8 @@ import { SettingsService } from './features/settings/services/settings.service';
     ProfileModule,
     SettingsModule,
     NotificationsModule,
+    MatDialogModule,
+    CalendarModule,
     SharedModule
   ],
   providers: [

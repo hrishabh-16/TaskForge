@@ -1,0 +1,56 @@
+/* todo-frontend/src/app/features/calendar/components/calendar-month-view/calendar-month-view.component.css */
+/* Custom styles for the month view */
+:host {
+    display: block;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    :host ::ng-deep .calendar-container {
+      overflow-x: auto;
+    }
+  }
+  
+  /* Task status color classes */
+  .task-status-pending {
+    @apply bg-yellow-100 border-yellow-300 text-yellow-800;
+  }
+  
+  .task-status-in-progress {
+    @apply bg-blue-100 border-blue-300 text-blue-800;
+  }
+  
+  .task-status-completed {
+    @apply bg-green-100 border-green-300 text-green-800;
+  }
+  
+  .task-status-on-hold {
+    @apply bg-purple-100 border-purple-300 text-purple-800;
+  }
+  
+  .task-status-overdue {
+    @apply bg-red-100 border-red-300 text-red-800;
+  }
+  
+  /* Priority indicator styles */
+  .priority-high {
+    border-left: 3px solid #ef4444;
+  }
+  
+  .priority-medium {
+    border-left: 3px solid #f59e0b;
+  }
+  
+  .priority-low {
+    border-left: 3px solid #10b981;
+  }
+  
+  /* Today highlight */
+  .today-cell {
+    @apply bg-blue-50;
+  }
+  
+  /* Hover effects for day cells */
+  .day-cell:hover {
+    @apply bg-gray-50;
+  }

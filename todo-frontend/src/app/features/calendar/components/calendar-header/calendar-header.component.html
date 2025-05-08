@@ -1,0 +1,78 @@
+<!-- todo-frontend/src/app/features/calendar/components/calendar-header/calendar-header.component.html -->
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-4 bg-white p-4 rounded-lg shadow-sm">
+  <!-- View Title -->
+  <h2 class="text-xl font-semibold text-gray-900 mb-2 md:mb-0">
+    {{ viewDateDisplay }}
+  </h2>
+  
+  <!-- Controls -->
+  <div class="flex items-center space-x-2">
+    <!-- Navigation -->
+    <div class="flex rounded-md shadow-sm">
+      <button
+        class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-l-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        mwlCalendarPreviousView
+        [view]="view === 'agenda' ? CalendarView.Month : view"
+        [(viewDate)]="viewDate"
+        (viewDateChange)="viewDateChange.next(viewDate)"
+      >
+        <svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
+        Previous
+      </button>
+      <button
+        class="inline-flex items-center px-3 py-2 border-t border-b border-gray-300 text-sm leading-4 font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        mwlCalendarToday
+        [(viewDate)]="viewDate"
+        (viewDateChange)="viewDateChange.next(viewDate)"
+      >
+        Today
+      </button>
+      <button
+        class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-r-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        mwlCalendarNextView
+        [view]="view === 'agenda' ? CalendarView.Month : view"
+        [(viewDate)]="viewDate"
+        (viewDateChange)="viewDateChange.next(viewDate)"
+      >
+        Next
+        <svg class="h-4 w-4 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+    
+    <!-- View Switcher -->
+    <div class="flex rounded-md shadow-sm ml-2">
+      <button
+        class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-l-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        [ngClass]="{'bg-blue-600 text-white': view === CalendarView.Month, 'bg-white text-gray-700 hover:bg-gray-50': view !== CalendarView.Month}"
+        (click)="viewChange.emit(CalendarView.Month)"
+      >
+        Month
+      </button>
+      <button
+        class="inline-flex items-center px-3 py-2 border-t border-b border-gray-300 text-sm leading-4 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        [ngClass]="{'bg-blue-600 text-white': view === CalendarView.Week, 'bg-white text-gray-700 hover:bg-gray-50': view !== CalendarView.Week}"
+        (click)="viewChange.emit(CalendarView.Week)"
+      >
+        Week
+      </button>
+      <button
+        class="inline-flex items-center px-3 py-2 border-t border-b border-gray-300 text-sm leading-4 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        [ngClass]="{'bg-blue-600 text-white': view === CalendarView.Day, 'bg-white text-gray-700 hover:bg-gray-50': view !== CalendarView.Day}"
+        (click)="viewChange.emit(CalendarView.Day)"
+      >
+        Day
+      </button>
+      <button
+        class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-r-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        [ngClass]="{'bg-blue-600 text-white': view === 'agenda', 'bg-white text-gray-700 hover:bg-gray-50': view !== 'agenda'}"
+        (click)="viewChange.emit(agendaView)"
+      >
+        Agenda
+      </button>
+    </div>
+  </div>
+</div>

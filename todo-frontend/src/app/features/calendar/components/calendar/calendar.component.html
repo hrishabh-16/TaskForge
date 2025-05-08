@@ -1,0 +1,198 @@
+<!-- todo-frontend/src/app/features/calendar/components/calendar/calendar.component.html -->
+<div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <!-- Calendar Header -->
+    <div class="px-6 py-5 border-b border-gray-200 bg-white">
+      <div class="flex flex-col md:flex-row md:items-center justify-between">
+        <div class="flex-1 mb-4 md:mb-0">
+          <h2 class="text-2xl font-bold text-gray-900">
+            {{ viewDate | date:'MMMM yyyy' }}
+          </h2>
+          <p class="mt-1 text-sm text-gray-500">
+            Visualize and manage your tasks in calendar view
+          </p>
+        </div>
+        
+        <!-- Navigation Controls -->
+        <div class="flex items-center space-x-2">
+          <div class="flex rounded-md shadow-sm">
+            <button 
+              class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-l-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              mwlCalendarPreviousView
+              [view]="view === 'agenda' ? CalendarView.Month : view"
+              [(viewDate)]="viewDate"
+              (viewDateChange)="closeOpenMonthViewDay()"
+            >
+              <svg class="h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+              Previous
+            </button>
+            <button
+              class="inline-flex items-center px-4 py-2 border-t border-b border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              mwlCalendarToday
+              [(viewDate)]="viewDate"
+            >
+              Today
+            </button>
+            <button
+              class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              mwlCalendarNextView
+              [view]="view === 'agenda' ? CalendarView.Month : view"
+              [(viewDate)]="viewDate"
+              (viewDateChange)="closeOpenMonthViewDay()"
+            >
+              Next
+              <svg class="h-4 w-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- View Selector and Filters -->
+      <div class="mt-4 flex flex-col md:flex-row items-start md:items-center justify-between space-y-4 md:space-y-0">
+        <!-- View Selector -->
+        <div class="inline-flex rounded-md shadow-sm">
+          <button
+            class="px-4 py-2 border text-sm font-medium rounded-l-md focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            [ngClass]="{'bg-blue-600 text-white': view === CalendarView.Month, 'text-gray-700 bg-white hover:bg-gray-50': view !== CalendarView.Month}"
+            (click)="setView(CalendarView.Month)"
+          >
+            Month
+          </button>
+          <button
+            class="px-4 py-2 border text-sm font-medium focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            [ngClass]="{'bg-blue-600 text-white': view === CalendarView.Week, 'text-gray-700 bg-white hover:bg-gray-50': view !== CalendarView.Week}"
+            (click)="setView(CalendarView.Week)"
+          >
+            Week
+          </button>
+          <button
+            class="px-4 py-2 border text-sm font-medium focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            [ngClass]="{'bg-blue-600 text-white': view === CalendarView.Day, 'text-gray-700 bg-white hover:bg-gray-50': view !== CalendarView.Day}"
+            (click)="setView(CalendarView.Day)"
+          >
+            Day
+          </button>
+          <button
+            class="px-4 py-2 border text-sm font-medium rounded-r-md focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            [ngClass]="{'bg-blue-600 text-white': view === agendaView, 'text-gray-700 bg-white hover:bg-gray-50': view !== agendaView}"
+            (click)="setView(agendaView)"
+          >
+            Agenda
+          </button>
+        </div>
+        
+        <!-- Filters -->
+        <div class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4">
+          <!-- Category Filter -->
+          <div class="relative inline-block text-left" #categoryDropdown>
+            <button 
+              type="button" 
+              (click)="categoryDropdownOpen = !categoryDropdownOpen" 
+              class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Categories
+              <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+            
+            <div *ngIf="categoryDropdownOpen" class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+              <div class="py-1">
+                <div *ngFor="let category of categories" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <input type="checkbox" [id]="'category-' + category.id" [value]="category.id" [(ngModel)]="category.selected"
+                    (change)="updateCategoryFilter()" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                  <label [for]="'category-' + category.id" class="ml-2 block text-sm text-gray-900">
+                    {{ category.name }}
+                  </label>
+                </div>
+                <div *ngIf="categories.length === 0" class="px-4 py-2 text-sm text-gray-500">
+                  No categories found
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Show Completed Toggle -->
+          <div class="flex items-center">
+            <input
+              id="show-completed"
+              type="checkbox"
+              [(ngModel)]="showCompleted"
+              (change)="updateFilters()"
+              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            >
+            <label for="show-completed" class="ml-2 text-sm text-gray-700">
+              Show completed tasks
+            </label>
+          </div>
+          
+          <!-- New Task Button -->
+          <button
+            (click)="openTaskFormDialog(viewDate)"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            New Task
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Loading Indicator -->
+    <div *ngIf="loading" class="flex justify-center items-center p-12 min-h-[600px]">
+      <svg class="animate-spin h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    </div>
+    
+    <!-- Calendar Views -->
+    <div [ngSwitch]="view" *ngIf="!loading" class="calendar-container">
+      <!-- Month View -->
+      <div *ngSwitchCase="CalendarView.Month">
+        <app-calendar-month-view
+          [viewDate]="viewDate"
+          [events]="events"
+          [refresh]="refresh"
+          (eventClicked)="eventClicked($event)"
+        ></app-calendar-month-view>
+      </div>
+      
+      <!-- Week View -->
+      <div *ngSwitchCase="CalendarView.Week">
+        <app-calendar-week-view
+          [viewDate]="viewDate"
+          [events]="events"
+          [refresh]="refresh"
+          (eventClicked)="eventClicked($event)"
+        ></app-calendar-week-view>
+      </div>
+      
+      <!-- Day View -->
+      <div *ngSwitchCase="CalendarView.Day">
+        <app-calendar-day-view
+          [viewDate]="viewDate"
+          [events]="events"
+          [refresh]="refresh"
+          (eventClicked)="eventClicked($event)"
+        ></app-calendar-day-view>
+      </div>
+      
+      <!-- Agenda View -->
+      <div *ngSwitchCase="agendaView">
+        <app-calendar-agenda-view
+          [viewDate]="viewDate"
+          [events]="events"
+          [refresh]="refresh"
+          (eventClicked)="eventClicked($event)"
+        ></app-calendar-agenda-view>
+      </div>
+    </div>
+  </div>
+</div>

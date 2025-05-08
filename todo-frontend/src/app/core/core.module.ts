@@ -5,17 +5,24 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AuthInterceptor } from './auth/interceptors/auth.interceptor';
 import { HttpService } from './services/http.service';
 import { NotificationService } from './services/notification.service';
+import { WebSocketService } from './services/web-socket.service';
+import { MaterialModule } from './material/material.module';
 
 @NgModule({
   declarations: [],
   imports: [
     CommonModule,
-    HttpClientModule
+    HttpClientModule,
+    MaterialModule
+  ],
+  exports: [
+    MaterialModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     HttpService,
-    NotificationService
+    NotificationService,
+    WebSocketService
   ]
 })
 export class CoreModule {

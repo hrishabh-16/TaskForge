@@ -1,0 +1,66 @@
+<!-- todo-frontend/src/app/features/calendar/components/calendar-week-view/calendar-week-view.component.html -->
+<div class="bg-white rounded-lg shadow">
+  <!-- Week day headers -->
+  <div class="grid grid-cols-7 border-b border-gray-200">
+    <div *ngFor="let day of weekDays" 
+         class="p-4 text-center border-r border-gray-200 last:border-r-0"
+         [ngClass]="{'bg-blue-50': day.isToday}">
+      <div class="text-sm font-medium text-gray-500">{{ day.dayName }}</div>
+      <div class="text-xl font-bold" [ngClass]="{'text-gray-900': !day.isToday, 'text-blue-600': day.isToday}">{{ day.dateNum }}</div>
+    </div>
+  </div>
+  
+  <!-- Week tasks by day -->
+  <div class="grid grid-cols-7 min-h-[600px]">
+    <div *ngFor="let day of weekDays" 
+         class="border-r border-gray-200 last:border-r-0 p-3 overflow-y-auto"
+         style="max-height: 600px;"
+         [ngClass]="{'bg-blue-50': day.isToday}">
+      
+      <!-- Tasks for this day -->
+      <div *ngIf="(weekTasks[day.dateKey] ?? []).length > 0" class="space-y-2">
+        <div *ngFor="let task of weekTasks[day.dateKey]" 
+             (click)="onTaskClick(task)"
+             class="group p-3 border rounded cursor-pointer transition-all duration-200 ease-in-out hover:shadow"
+             [ngClass]="{
+               'bg-red-50 border-red-200': task.status !== 'COMPLETED' && isOverdue(task),
+               'bg-yellow-50 border-yellow-200': task.status === 'PENDING' && !isOverdue(task),
+               'bg-blue-50 border-blue-200': task.status === 'IN_PROGRESS',
+               'bg-green-50 border-green-200': task.status === 'COMPLETED',
+               'bg-purple-50 border-purple-200': task.status === 'ON_HOLD'
+             }">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <h4 class="text-sm font-medium text-gray-900 truncate" [ngClass]="{'line-through opacity-70': task.status === 'COMPLETED'}">{{ task.title }}</h4>
+              
+              <div class="mt-1 flex items-center text-xs text-gray-500">
+                <span class="flex items-center" *ngIf="task.dueDate">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {{ formatTime(task.dueDate) }}
+                </span>
+              </div>
+            </div>
+            
+            <span *ngIf="task.priority" 
+                  class="ml-1 px-1.5 py-0.5 text-xs rounded-full"
+                  [ngClass]="{
+                    'bg-red-100 text-red-800': task.priority === 'HIGH',
+                    'bg-yellow-100 text-yellow-800': task.priority === 'MEDIUM',
+                    'bg-green-100 text-green-800': task.priority === 'LOW'
+                  }">
+              {{ task.priority.charAt(0) }}
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- No tasks placeholder -->
+      <div *ngIf="!weekTasks[day.dateKey] || weekTasks[day.dateKey].length === 0" 
+           class="text-center text-gray-400 text-xs py-4">
+        <span class="block">No tasks</span>
+      </div>
+    </div>
+  </div>
+</div>

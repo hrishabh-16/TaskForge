@@ -15,6 +15,7 @@ import { CategoryFormComponent } from './features/categories/components/category
 import { ProfileComponent } from './features/profile/components/profile/profile.component';
 import { SettingsComponent } from './features/settings/components/settings/settings.component';
 import { NotificationListComponent } from './features/notifications/components/notification-list/notification-list.component';
+import { CalendarComponent } from './features/calendar/components/calendar/calendar.component';
 
 import { AuthGuard } from './core/auth/guards/auth.guard';
 
@@ -62,11 +63,12 @@ const routes: Routes = [
   
   
   // Calendar placeholder route
-  { path: 'calendar', component: DashboardComponent, canActivate: [AuthGuard] },
   
-  // Categories placeholder routes
-  { path: 'categories/:id', component: TaskListComponent, canActivate: [AuthGuard] },
-  { path: 'categories/new', component: DashboardComponent, canActivate: [AuthGuard] },
+{ path: 'calendar', component: CalendarComponent, canActivate: [AuthGuard] },
+  
+  // // Categories placeholder routes
+  // { path: 'categories/:id', component: TaskListComponent, canActivate: [AuthGuard] },
+  // { path: 'categories/new', component: DashboardComponent, canActivate: [AuthGuard] },
   
   // Settings placeholder route
   { path: 'settings', component: DashboardComponent, canActivate: [AuthGuard] },
