@@ -38,20 +38,19 @@
     <form *ngIf="!isLoading" [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="w-full">
       <div class="shadow sm:rounded-md sm:overflow-hidden">
         <div class="px-6 py-6 bg-white space-y-6">
-          <!-- Title -->
-          <div class="space-y-2">
-            <label for="title" class="block text-sm font-medium text-gray-700">Title <span class="text-red-500">*</span></label>
-            <div>
-              <input
-                type="text"
-                id="title"
-                formControlName="title"
-                class="shadow-sm focus:ring-black focus:border-black block w-full sm:text-sm border-gray-300 rounded-md"
-                [ngClass]="{'border-red-500': titleInvalid}"
-              >
-              <p *ngIf="titleInvalid" class="mt-1 text-sm text-red-600">{{ titleErrorMessage }}</p>
-            </div>
+        <!-- Title -->
+        <div class="space-y-2">
+          <label for="title" class="block text-sm font-medium text-gray-700">
+            Title <span class="text-red-500">*</span>
+          </label>
+          <div>
+            <input type="text" id="title" formControlName="title"
+              class="shadow-sm focus:ring-black focus:border-black block w-full text-base sm:text-lg py-3 px-4 border-gray-300 rounded-md"
+              [ngClass]="{'border-red-500': titleInvalid}">
+            <p *ngIf="titleInvalid" class="mt-1 text-sm text-red-600">{{ titleErrorMessage }}</p>
           </div>
+        </div>
+
           
           <!-- Description -->
           <div class="space-y-2">
