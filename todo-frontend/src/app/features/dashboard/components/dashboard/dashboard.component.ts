@@ -198,8 +198,7 @@ export class DashboardComponent implements OnInit {
   }
   
   createNewTask(): void {
-    // Will be implemented in the Task module
-    console.log('Create new task clicked from dashboard');
+    this.router.navigate(['/tasks/new']);
   }
   
   
