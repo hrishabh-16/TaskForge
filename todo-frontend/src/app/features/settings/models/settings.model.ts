@@ -9,6 +9,13 @@ export interface UserSettings {
     darkMode: boolean;
     language: string;
   }
+  export interface UserSettingsRequest {
+    username?: string;
+    notificationsEnabled?: boolean;
+    emailNotifications?: boolean;
+    darkMode?: boolean;
+    language?: string;
+  }
   
   export interface AccountDeactivationRequest {
     password: string;

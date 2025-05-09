@@ -1,14 +1,16 @@
+// src/app/features/settings/services/settings.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { UserSettings, AccountDeactivationRequest, NotificationSettings, AppearanceSettings, PrivacySettings, DeleteAccountRequest } from '../models/settings.model';
+import { catchError, tap } from 'rxjs/operators';
+import { UserSettings, AccountDeactivationRequest, NotificationSettings, AppearanceSettings, PrivacySettings, DeleteAccountRequest, UserSettingsRequest } from '../models/settings.model';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SettingsService {
+  // Use the correct endpoint from your backend controller: /api/users/me/settings
   private apiUrl = `${environment.apiUrl}/users/me/settings`;
 
   constructor(private http: HttpClient) {}
@@ -18,23 +20,33 @@ export class SettingsService {
       .pipe(catchError(this.handleError));
   }
 
-  updateUserSettings(settings: Partial<UserSettings>): Observable<UserSettings> {
-    return this.http.put<UserSettings>(`${this.apiUrl}`, settings)
+  updateUserSettings(settings: UserSettingsRequest): Observable<UserSettings> {
+    console.log('Updating user settings with:', settings);
+    console.log('Update settings URL:', this.apiUrl);
+    
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    
+    return this.http.put<UserSettings>(`${this.apiUrl}`, settings, { headers })
+      .pipe(
+        tap(response => console.log('Settings update response:', response)),
+        catchError(this.handleError)
+      );
+  }
+
+  updateNotificationSettings(settings: NotificationSettings): Observable<UserSettings> {
+    return this.http.put<UserSettings>(`${this.apiUrl}/notifications`, settings)
       .pipe(catchError(this.handleError));
   }
 
-  updateNotificationSettings(settings: NotificationSettings): Observable<NotificationSettings> {
-    return this.http.put<NotificationSettings>(`${this.apiUrl}/notifications`, settings)
+  updateAppearanceSettings(settings: AppearanceSettings): Observable<UserSettings> {
+    return this.http.put<UserSettings>(`${this.apiUrl}/appearance`, settings)
       .pipe(catchError(this.handleError));
   }
 
-  updateAppearanceSettings(settings: AppearanceSettings): Observable<AppearanceSettings> {
-    return this.http.put<AppearanceSettings>(`${this.apiUrl}/appearance`, settings)
-      .pipe(catchError(this.handleError));
-  }
-
-  updatePrivacySettings(settings: PrivacySettings): Observable<PrivacySettings> {
-    return this.http.put<PrivacySettings>(`${this.apiUrl}/privacy`, settings)
+  updatePrivacySettings(settings: PrivacySettings): Observable<UserSettings> {
+    return this.http.put<UserSettings>(`${this.apiUrl}/privacy`, settings)
       .pipe(catchError(this.handleError));
   }
 
@@ -71,7 +83,7 @@ export class SettingsService {
       // Handle different status codes
       switch (error.status) {
         case 400:
-          errorMessage = 'Bad request. Please check your input.';
+          errorMessage = error.error && error.error.message ? error.error.message : 'Bad request. Please check your input.';
           break;
         case 401:
           errorMessage = 'Unauthorized. Please log in again.';

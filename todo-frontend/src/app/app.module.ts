@@ -35,6 +35,7 @@ import { ForgotPasswordComponent } from './features/auth/components/forgot-passw
 import { ResetPasswordComponent } from './features/auth/components/reset-password/reset-password.component';
 
 
+
 // Services
 import { TaskService } from './features/tasks/services/task.service';
 import { CategoryService } from './features/categories/services/category.service';
@@ -68,6 +69,10 @@ import { SettingsService } from './features/settings/services/settings.service';
       timeOut: 3000,
       positionClass: 'toast-top-right',
       preventDuplicates: true,
+      progressBar: true,
+      closeButton: true,
+      easing: 'ease-in',
+      progressAnimation: 'increasing'
     }),
     DashboardModule,
     TasksModule,

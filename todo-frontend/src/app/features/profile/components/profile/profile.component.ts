@@ -6,10 +6,14 @@ import { TaskService } from '../../../../features/tasks/services/task.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
+import { catchError, finalize, of } from 'rxjs';
+import { ProfileUpdateRequest } from '../../models/profile.model';
+import { CustomToastService } from '../../../../core/services/custom-toast.service';
+import { Injectable } from '@angular/core';
 
 @Component({
   selector: 'app-profile',
-  standalone:false,
+  standalone: false,
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
@@ -20,19 +24,25 @@ export class ProfileComponent implements OnInit {
   
   profileForm: FormGroup;
   isEditMode = false;
+  isSubmitting = false;
   
   passwordForm: FormGroup;
   isChangingPassword = false;
+  isSubmittingPassword = false;
   
   loginActivities: any[] = [];
   loadingActivities = false;
+  
+  // Success banner flag
+  showSuccessBanner = false;
 
   constructor(
     private profileService: ProfileService,
     private taskService: TaskService,
     private authService: AuthService,
     private formBuilder: FormBuilder,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private customToast: CustomToastService // Add custom toast service
   ) {
     this.profileForm = this.formBuilder.group({
       username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]]
@@ -48,6 +58,19 @@ export class ProfileComponent implements OnInit {
   ngOnInit(): void {
     this.loadProfile();
     this.loadLoginActivity();
+    this.testToastr(); // Test the toastr on init
+  }
+  
+  // Test toastr functionality
+  testToastr(): void {
+    setTimeout(() => {
+      this.profileService.testToastr().subscribe({
+        next: () => {
+          console.log('Testing all notification methods...');
+      
+        }
+      });
+    }, 1000);
   }
 
   loadProfile(): void {
@@ -142,28 +165,47 @@ export class ProfileComponent implements OnInit {
       this.toastr.error('Please correct the form errors before submitting', 'Validation Error');
       return;
     }
-
-    const formData = this.profileForm.value;
+  
+    this.isSubmitting = true;
     
-    this.profileService.updateProfile(formData).subscribe({
-      next: (updatedProfile) => {
-        this.profile = updatedProfile;
-        this.isEditMode = false;
-        this.toastr.success('Profile updated successfully', 'Success');
-        
-        // Update current user in auth service if necessary
-        if (this.authService.currentUserValue) {
-          const currentUser = this.authService.currentUserValue;
-          currentUser.username = updatedProfile.username;
-          localStorage.setItem('currentUser', JSON.stringify(currentUser));
-          // Trigger update in the auth service
-          this.authService.updateCurrentUser(currentUser);
+    // Create the ProfileUpdateRequest object with exact field name expected by the backend
+    const formData: ProfileUpdateRequest = {
+      username: this.profileForm.value.username
+    };
+    
+    console.log('Sending profile update with data:', formData);
+    
+    this.profileService.updateProfile(formData)
+      .pipe(
+        catchError(err => {
+          console.error('Profile update error:', err);
+          this.toastr.error(err.message || 'Failed to update profile', 'Error');
+          return of(null);
+        }),
+        finalize(() => {
+          this.isSubmitting = false;
+        })
+      )
+      .subscribe(updatedProfile => {
+        if (updatedProfile) {
+          console.log('Profile update successful:', updatedProfile);
+          this.profile = updatedProfile;
+          this.isEditMode = false;
+          this.toastr.success('Profile updated successfully', 'Success');
+          
+          // Update current user in auth service
+          if (this.authService.currentUserValue) {
+            const currentUser = this.authService.currentUserValue;
+            currentUser.username = updatedProfile.username;
+            
+            // Update local storage
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // Update auth service state
+            this.authService.updateCurrentUser(currentUser);
+          }
         }
-      },
-      error: (err) => {
-        this.toastr.error(err.message || 'Failed to update profile', 'Error');
-      }
-    });
+      });
   }
 
   changePassword(): void {
@@ -172,18 +214,59 @@ export class ProfileComponent implements OnInit {
       return;
     }
 
-    const passwordData = this.passwordForm.value;
+    this.isSubmittingPassword = true;
+    const passwordData = {
+      currentPassword: this.passwordForm.value.currentPassword,
+      newPassword: this.passwordForm.value.newPassword,
+      confirmPassword: this.passwordForm.value.confirmPassword
+    };
     
-    this.profileService.changePassword(passwordData).subscribe({
-      next: () => {
-        this.passwordForm.reset();
-        this.isChangingPassword = false;
-        this.toastr.success('Password changed successfully', 'Success');
-      },
-      error: (err) => {
-        this.toastr.error(err.message || 'Failed to change password', 'Error');
-      }
-    });
+    // Log for debugging
+    console.log('Attempting to change password...');
+    
+    this.profileService.changePassword(passwordData)
+      .pipe(
+        catchError(err => {
+          console.error('Password change error:', err);
+          
+          // Try both notification methods for errors
+          this.toastr.error(err.message || 'Failed to change password', 'Error');
+          this.customToast.showError('Failed to change password. Please try again.');
+          
+          return of(null);
+        }),
+        finalize(() => {
+          this.isSubmittingPassword = false;
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          if (response !== null) {
+            console.log('Password change successful:', response);
+            
+            // Try multiple notification methods to ensure at least one works
+            this.showPasswordSuccessNotifications();
+            
+            // Reset the form and close it
+            this.passwordForm.reset();
+            this.isChangingPassword = false;
+          }
+        },
+        error: (error) => {
+          console.error('Password change subscription error:', error);
+        }
+      });
+  }
+  
+  // Show multiple types of success notifications to ensure visibility
+  private showPasswordSuccessNotifications(): void {
+    // custom toast for password change success
+    this.customToast.showSuccess('Your password has been changed successfully', 'Password Updated'); 
+  }
+  
+  // Method to dismiss the success banner manually
+  dismissSuccessBanner(): void {
+    this.showSuccessBanner = false;
   }
 
   passwordMatchValidator(group: FormGroup): { [key: string]: any } | null {

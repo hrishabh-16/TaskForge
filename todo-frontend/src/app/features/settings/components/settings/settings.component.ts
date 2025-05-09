@@ -6,6 +6,8 @@ import { ToastrService } from 'ngx-toastr';
 import { UserSettings, AccountDeactivationRequest, DeleteAccountRequest } from '../../models/settings.model';
 import { SettingsService } from '../../services/settings.service';
 import { AuthService } from '../../../../core/auth/services/auth.service';
+import { catchError, finalize, of } from 'rxjs';
+import { UserSettingsRequest } from '../../models/settings.model';
 
 @Component({
   selector: 'app-settings',
@@ -21,15 +23,24 @@ export class SettingsComponent implements OnInit {
   selectedTab = 'account';
   
   accountSettingsForm: FormGroup;
+  isSubmittingAccount = false;
+  
   notificationSettingsForm: FormGroup;
+  isSubmittingNotifications = false;
+  
   appearanceSettingsForm: FormGroup;
+  isSubmittingAppearance = false;
+  
   privacySettingsForm: FormGroup;
+  isSubmittingPrivacy = false;
   
   isDeactivating = false;
   deactivateAccountForm: FormGroup;
+  isSubmittingDeactivation = false;
   
   isDeleting = false;
   deleteAccountForm: FormGroup;
+  isSubmittingDeletion = false;
   
   deleteConfirmPhrase = 'delete my account';
 
@@ -120,27 +131,46 @@ export class SettingsComponent implements OnInit {
       this.toastr.error('Please correct the form errors before submitting', 'Validation Error');
       return;
     }
-
-    const formData = this.accountSettingsForm.getRawValue();
+  
+    this.isSubmittingAccount = true;
     
-    this.settingsService.updateUserSettings(formData).subscribe({
-      next: (updatedSettings) => {
-        this.settings = { ...this.settings, ...updatedSettings };
-        this.toastr.success('Account settings updated successfully', 'Success');
-        
-        // Update current user in auth service if necessary
-        if (this.authService.currentUserValue) {
-          const currentUser = this.authService.currentUserValue;
-          currentUser.username = updatedSettings.username;
-          localStorage.setItem('currentUser', JSON.stringify(currentUser));
-          // Assuming there's a method to update the current user in the auth service
-          this.authService.updateCurrentUser(currentUser);
+    // Create the UserSettingsRequest object with exact field name expected by the backend
+    const updateData: UserSettingsRequest = {
+      username: this.accountSettingsForm.value.username
+    };
+    
+    console.log('Sending settings update with data:', updateData);
+    
+    this.settingsService.updateUserSettings(updateData)
+      .pipe(
+        catchError(err => {
+          console.error('Settings update error:', err);
+          this.toastr.error(err.message || 'Failed to update account settings', 'Error');
+          return of(null);
+        }),
+        finalize(() => {
+          this.isSubmittingAccount = false;
+        })
+      )
+      .subscribe(updatedSettings => {
+        if (updatedSettings) {
+          console.log('Settings update successful:', updatedSettings);
+          this.settings = { ...this.settings, ...updatedSettings };
+          this.toastr.success('Account settings updated successfully', 'Success');
+          
+          // Update current user in auth service
+          if (this.authService.currentUserValue) {
+            const currentUser = this.authService.currentUserValue;
+            currentUser.username = updatedSettings.username;
+            
+            // Update local storage
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // Update auth service state
+            this.authService.updateCurrentUser(currentUser);
+          }
         }
-      },
-      error: (err) => {
-        this.toastr.error(err.message || 'Failed to update account settings', 'Error');
-      }
-    });
+      });
   }
 
   saveNotificationSettings(): void {
@@ -149,16 +179,24 @@ export class SettingsComponent implements OnInit {
       return;
     }
 
+    this.isSubmittingNotifications = true;
     const formData = this.notificationSettingsForm.value;
     
-    this.settingsService.updateNotificationSettings(formData).subscribe({
-      next: () => {
-        this.toastr.success('Notification settings updated successfully', 'Success');
-      },
-      error: (err) => {
-        this.toastr.error(err.message || 'Failed to update notification settings', 'Error');
-      }
-    });
+    this.settingsService.updateNotificationSettings(formData)
+      .pipe(
+        catchError(err => {
+          this.toastr.error(err.message || 'Failed to update notification settings', 'Error');
+          return of(null);
+        }),
+        finalize(() => {
+          this.isSubmittingNotifications = false;
+        })
+      )
+      .subscribe(response => {
+        if (response) {
+          this.toastr.success('Notification settings updated successfully', 'Success');
+        }
+      });
   }
 
   saveAppearanceSettings(): void {
@@ -167,23 +205,31 @@ export class SettingsComponent implements OnInit {
       return;
     }
 
+    this.isSubmittingAppearance = true;
     const formData = this.appearanceSettingsForm.value;
     
-    this.settingsService.updateAppearanceSettings(formData).subscribe({
-      next: () => {
-        this.toastr.success('Appearance settings updated successfully', 'Success');
-        
-        // Apply dark mode if enabled
-        if (formData.darkMode) {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
+    this.settingsService.updateAppearanceSettings(formData)
+      .pipe(
+        catchError(err => {
+          this.toastr.error(err.message || 'Failed to update appearance settings', 'Error');
+          return of(null);
+        }),
+        finalize(() => {
+          this.isSubmittingAppearance = false;
+        })
+      )
+      .subscribe(response => {
+        if (response) {
+          this.toastr.success('Appearance settings updated successfully', 'Success');
+          
+          // Apply dark mode if enabled
+          if (formData.darkMode) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
         }
-      },
-      error: (err) => {
-        this.toastr.error(err.message || 'Failed to update appearance settings', 'Error');
-      }
-    });
+      });
   }
 
   savePrivacySettings(): void {
@@ -192,16 +238,24 @@ export class SettingsComponent implements OnInit {
       return;
     }
 
+    this.isSubmittingPrivacy = true;
     const formData = this.privacySettingsForm.value;
     
-    this.settingsService.updatePrivacySettings(formData).subscribe({
-      next: () => {
-        this.toastr.success('Privacy settings updated successfully', 'Success');
-      },
-      error: (err) => {
-        this.toastr.error(err.message || 'Failed to update privacy settings', 'Error');
-      }
-    });
+    this.settingsService.updatePrivacySettings(formData)
+      .pipe(
+        catchError(err => {
+          this.toastr.error(err.message || 'Failed to update privacy settings', 'Error');
+          return of(null);
+        }),
+        finalize(() => {
+          this.isSubmittingPrivacy = false;
+        })
+      )
+      .subscribe(response => {
+        if (response) {
+          this.toastr.success('Privacy settings updated successfully', 'Success');
+        }
+      });
   }
 
   toggleAccountStatus(): void {
@@ -212,17 +266,21 @@ export class SettingsComponent implements OnInit {
       this.isDeactivating = true;
     } else {
       // Activate account
-      this.settingsService.activateAccount().subscribe({
-        next: () => {
-          this.toastr.success('Your account has been reactivated', 'Success');
-          if (this.settings) {
-            this.settings.accountActive = true;
+      this.settingsService.activateAccount()
+        .pipe(
+          catchError(err => {
+            this.toastr.error(err.message || 'Failed to reactivate account', 'Error');
+            return of(null);
+          })
+        )
+        .subscribe(response => {
+          if (response) {
+            this.toastr.success('Your account has been reactivated', 'Success');
+            if (this.settings) {
+              this.settings.accountActive = true;
+            }
           }
-        },
-        error: (err) => {
-          this.toastr.error(err.message || 'Failed to reactivate account', 'Error');
-        }
-      });
+        });
     }
   }
 
@@ -232,21 +290,29 @@ export class SettingsComponent implements OnInit {
       return;
     }
 
+    this.isSubmittingDeactivation = true;
     const request: AccountDeactivationRequest = this.deactivateAccountForm.value;
     
-    this.settingsService.deactivateAccount(request).subscribe({
-      next: () => {
-        this.toastr.success('Your account has been deactivated', 'Success');
-        if (this.settings) {
-          this.settings.accountActive = false;
+    this.settingsService.deactivateAccount(request)
+      .pipe(
+        catchError(err => {
+          this.toastr.error(err.message || 'Failed to deactivate account', 'Error');
+          return of(null);
+        }),
+        finalize(() => {
+          this.isSubmittingDeactivation = false;
+        })
+      )
+      .subscribe(response => {
+        if (response) {
+          this.toastr.success('Your account has been deactivated', 'Success');
+          if (this.settings) {
+            this.settings.accountActive = false;
+          }
+          this.isDeactivating = false;
+          this.deactivateAccountForm.reset();
         }
-        this.isDeactivating = false;
-        this.deactivateAccountForm.reset();
-      },
-      error: (err) => {
-        this.toastr.error(err.message || 'Failed to deactivate account', 'Error');
-      }
-    });
+      });
   }
 
   cancelDeactivation(): void {
@@ -269,21 +335,29 @@ export class SettingsComponent implements OnInit {
       return;
     }
 
+    this.isSubmittingDeletion = true;
     const request: DeleteAccountRequest = this.deleteAccountForm.value;
     
-    this.settingsService.deleteAccount(request).subscribe({
-      next: () => {
-        this.toastr.success('Your account has been deleted. Redirecting to login page...', 'Success');
-        // Logout user and redirect to login page
-        this.authService.logout();
-        setTimeout(() => {
-          this.router.navigate(['/login']);
-        }, 2000);
-      },
-      error: (err) => {
-        this.toastr.error(err.message || 'Failed to delete account', 'Error');
-      }
-    });
+    this.settingsService.deleteAccount(request)
+      .pipe(
+        catchError(err => {
+          this.toastr.error(err.message || 'Failed to delete account', 'Error');
+          return of(null);
+        }),
+        finalize(() => {
+          this.isSubmittingDeletion = false;
+        })
+      )
+      .subscribe(response => {
+        if (response) {
+          this.toastr.success('Your account has been deleted. Redirecting to login page...', 'Success');
+          // Logout user and redirect to login page
+          this.authService.logout();
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 2000);
+        }
+      });
   }
 
   exportUserData(): void {
@@ -313,5 +387,18 @@ export class SettingsComponent implements OnInit {
       return { incorrectPhrase: true };
     }
     return null;
+  }
+
+  private updateAuthUser(username: string): void {
+    if (this.authService.currentUserValue) {
+      const currentUser = this.authService.currentUserValue;
+      currentUser.username = username;
+      
+      // Update local storage
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      
+      // Update auth service state
+      this.authService.updateCurrentUser(currentUser);
+    }
   }
 }
