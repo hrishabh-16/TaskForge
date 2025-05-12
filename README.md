@@ -106,13 +106,13 @@ For detailed documentation, please visit:
 
 ## 📸 Screenshots
 
-![Dashboard](https://via.placeholder.com/800x450?text=TaskForge+Dashboard)
+![Dashboard](https://drive.google.com/file/d/1pndNUiv-39IQCuoWLqkD64FPMLkKJbug/view?usp=sharing)
 *TaskForge Dashboard View*
 
-![Task Management](https://via.placeholder.com/800x450?text=Task+Management)
+![Task Management](https://drive.google.com/file/d/1YeJiBARLTXq5CzeDYdtGGYFa7SMVFosT/view?usp=sharing)
 *Task Management Interface*
 
-![Calendar View](https://via.placeholder.com/800x450?text=Calendar+View)
+![Calendar View](https://drive.google.com/file/d/1o6Nk3UKo-jUTkgZSAx2KedJkQdt5fXDq/view?usp=sharing)
 *Calendar View for Task Planning*
 
 ## 📦 Tech Stack
