@@ -10,8 +10,6 @@
 
 **TaskForge** is a comprehensive full-stack task management application designed to help individuals and teams organize, track, and complete tasks efficiently. Built with Spring Boot backend and Angular frontend, TaskForge offers a robust and feature-rich solution for personal and professional task management.
 
-![TaskForge Banner](https://via.placeholder.com/1200x300?text=TaskForge+Task+Management+Application)
-
 ## ✨ Key Features
 
 - **📝 Comprehensive Task Management**
@@ -103,17 +101,6 @@ For detailed documentation, please visit:
 - [Backend Documentation](https://github.com/hrishabh-16/TaskForge/blob/main/todo-backend/README.md) - Spring Boot backend details
 - [Frontend Documentation](https://github.com/hrishabh-16/TaskForge/blob/main/todo-frontend/README.md) - Angular frontend details
 - API Documentation: Available at `http://localhost:4000/swagger-ui/index.html` when running the backend
-
-## 📸 Screenshots
-
-![Dashboard](https://drive.google.com/file/d/1pndNUiv-39IQCuoWLqkD64FPMLkKJbug/view?usp=sharing)
-*TaskForge Dashboard View*
-
-![Task Management](https://drive.google.com/file/d/1YeJiBARLTXq5CzeDYdtGGYFa7SMVFosT/view?usp=sharing)
-*Task Management Interface*
-
-![Calendar View](https://drive.google.com/file/d/1o6Nk3UKo-jUTkgZSAx2KedJkQdt5fXDq/view?usp=sharing)
-*Calendar View for Task Planning*
 
 ## 📦 Tech Stack
 
