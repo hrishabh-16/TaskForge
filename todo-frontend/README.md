@@ -1,59 +1,227 @@
-# TodoFrontend
+# TaskForge Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.1.
+## 📝 Project Overview
 
-## Development server
+The **TaskForge Frontend** is a modern Angular application that serves as the user interface for the full-stack task management system. This responsive and intuitive frontend provides a seamless experience for managing tasks, categories, profiles, and notifications with a clean and user-friendly design.
 
-To start a local development server, run:
+## 🚀 Features
 
-```bash
-ng serve
+### 👤 User Management
+
+- Secure login and registration
+- Password reset functionality
+- Profile management
+- User settings customization
+
+### ✅ Task Management
+
+- Create, read, update, and delete tasks
+- Task categorization and organization in lists
+- Status tracking (Pending, In Progress, Completed, etc.)
+- Priority levels assignment (Low, Medium, High, Urgent)
+- Due date management with calendar integration
+- Task filtering and searching
+
+### ✨ Additional Task Features
+
+- Task commenting system
+- File attachment uploads
+- Task sharing with other users
+
+### 🗓️ Calendar Integration
+
+- Visual calendar view of tasks
+- Deadline tracking
+- Event scheduling
+
+### 🔔 Notifications
+
+- Real-time notifications using WebSockets
+- Task reminders
+- Status update notifications
+- Assignment notifications
+
+### 📱 Responsive Design
+
+- Mobile-friendly interface
+- Responsive layouts for all screen sizes
+- Touch-optimized interactions
+
+## ⚙️ Technologies & Dependencies
+
+### Core
+
+- **Angular 19.2.x**
+- **TypeScript 5.7.x**
+- **RxJS 7.8.x**
+- **TailwindCSS 4.1.x**
+
+### UI Components
+
+- **Angular Material 19.2.x**
+- **NgX-Toastr 19.0.0**
+- **Angular Calendar 0.31.1**
+
+### Real-time Communication
+
+- **SockJS 1.6.1**
+- **StompJS 2.3.3**
+
+### Development Tools
+
+- **Angular CLI 19.2.x**
+
+## 📁 Project Structure
+
+```
+todo-frontend/
+├── .angular/
+├── .vscode/
+├── node_modules/
+├── public/
+├── src/
+│   ├── app/
+│   │   ├── core/
+│   │   │   ├── auth/
+│   │   │   │   ├── guards/
+│   │   │   │   ├── interceptors/
+│   │   │   │   ├── models/
+│   │   │   │   ├── services/
+│   │   │   ├── material/
+│   │   │   ├── models/
+│   │   │   ├── services/
+│   │   ├── features/
+│   │   │   ├── attachments/
+│   │   │   ├── auth/
+│   │   │   ├── calendar/
+│   │   │   ├── categories/
+│   │   │   ├── comments/
+│   │   │   ├── dashboard/
+│   │   │   ├── notifications/
+│   │   │   ├── profile/
+│   │   │   ├── settings/
+│   │   │   ├── task-lists/
+│   │   │   ├── tasks/
+│   │   ├── shared/
+│   │   │   ├── components/
+│   │   │   │   ├── footer/
+│   │   │   │   ├── header/
+│   │   │   │   ├── sidebar/
+│   │   │   ├── directives/
+│   │   │   ├── pipes/
+│   │   ├── app-routing.module.ts
+│   │   ├── app.component.css
+│   │   ├── app.component.html
+│   │   ├── app.component.spec.ts
+│   │   ├── app.component.ts
+│   │   ├── app.module.ts
+│   ├── assets/
+│   ├── environments/
+│   ├── index.html
+│   ├── main.ts
+│   ├── styles.css
+│   ├── typings.d.ts
+├── .editorconfig
+├── .gitignore
+├── .postcssrc.json
+├── angular.json
+├── Dockerfile
+├── package-lock.json
+├── package.json
+├── proxy.conf.json
+├── README.md
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.spec.json
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## 🛠️ Getting Started
 
-## Code scaffolding
+### ✅ Prerequisites
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- Node.js 18.x or higher
+- npm 9.x or higher
+- Angular CLI 19.2.x
 
-```bash
-ng generate component component-name
+### ⚙️ Configuration
+
+Update your `proxy.conf.json` to connect to your backend:
+
+```json
+{
+  "/api": {
+    "target": "http://localhost:4000",
+    "secure": false,
+    "changeOrigin": true
+  }
+}
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## ▶️ Installation & Running
+
+### Method 1: Traditional Setup
 
 ```bash
-ng generate --help
+# Clone the repository
+git clone https://github.com/hrishabh-16/TaskForge.git
+cd TaskForge/todo-frontend
+
+# Install dependencies
+npm install
+
+# Run the application in development mode
+npm start
+
+# The application will be available at:
+# http://localhost:4200
 ```
 
-## Building
-
-To build the project run:
+### Method 2: Docker Setup
 
 ```bash
-ng build
+# Clone the repository
+git clone https://github.com/hrishabh-16/TaskForge.git
+cd TaskForge/todo-frontend
+
+# Build Docker image
+docker build -t hrishabh20/todo-frontend:latest .
+
+# Run Docker container
+docker run -p 4200:80 hrishabh20/todo-frontend:latest
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## 🔧 Building for Production
 
 ```bash
-ng test
+# Generate production build
+npm run build
+
+# The build artifacts will be stored in the dist/ directory
 ```
 
-## Running end-to-end tests
+## 🔒 Security Features
 
-For end-to-end (e2e) testing, run:
+- JWT-based authentication
+- HTTP interceptors for request/response handling
+- Route guards for protected content
+- Secure storage of user information
 
-```bash
-ng e2e
-```
+## 🔮 Future Enhancements
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+- Offline mode with local storage
+- Dark/light theme toggle
+- Task templates
+- Advanced analytics dashboard
+- Drag and drop task management
 
-## Additional Resources
+## 👥 Contributing
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📞 Contact
+
+Project Link: [https://github.com/hrishabh-16/TaskForge](https://github.com/hrishabh-16/TaskForge)
