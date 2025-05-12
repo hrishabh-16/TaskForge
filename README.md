@@ -109,7 +109,7 @@ For detailed documentation, please visit:
 ![Dashboard](https://drive.google.com/file/d/1pndNUiv-39IQCuoWLqkD64FPMLkKJbug/view?usp=sharing)
 *TaskForge Dashboard View*
 
-![Task Management](https://drive.google.com/file/d/1YeJiBARLTXq5CzeDYdtGGYFa7SMVFosT/view?usp=sharing)
+![Task Management](https://www.flickr.com/photos/202786129@N07/54514137804/in/photostream/lightbox/)
 *Task Management Interface*
 
 ![Calendar View](https://drive.google.com/file/d/1o6Nk3UKo-jUTkgZSAx2KedJkQdt5fXDq/view?usp=sharing)
