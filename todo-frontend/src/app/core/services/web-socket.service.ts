@@ -28,7 +28,7 @@ export class WebSocketService {
   connect(): void {
     try {
       if (typeof SockJS !== 'undefined') {
-        const socket = new SockJS('http://localhost:4000/ws');
+        const socket = new SockJS('https://todo-backend-cahd.onrender.com/ws');
         this.stompClient = Stomp.over(socket);
         
         // Set debug to false to reduce console noise

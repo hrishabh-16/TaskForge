@@ -1,6 +1,6 @@
 
   "/api": {
-    "target": "http://localhost:4000",
+    "target": "https://todo-backend-cahd.onrender.com",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"

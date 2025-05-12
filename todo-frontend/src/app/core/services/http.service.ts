@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class HttpService {
-  private apiUrl = 'http://localhost:4000/api';
+  private apiUrl = 'https://todo-backend-cahd.onrender.com/api';
 
   constructor(private http: HttpClient) {}
 
