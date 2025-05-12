@@ -1,17 +1,15 @@
-# 📋 Todo App Backend
+# TaskForge Backend
 
 ## 📝 Project Overview
 
-The **Todo App Backend** is a comprehensive Spring Boot application that serves as the backend for a full-stack task management system. It provides secure user authentication, task and category management, comments, attachments, and a notification system to deliver a complete task organization experience.
-
----
+The **TaskForge Backend** is a comprehensive Spring Boot application that serves as the backend for a full-stack task management system. It provides secure user authentication, task and category management, comments, attachments, and a notification system to deliver a complete task organization experience.
 
 ## 🚀 Features
 
 ### 👤 User Management
 
 - Secure registration and authentication using JWT
-- Role-based access control (User/Admin)
+- Role-based access control (User)
 - Password reset with email verification
 - User profile management
 
@@ -28,7 +26,6 @@ The **Todo App Backend** is a comprehensive Spring Boot application that serves 
 
 - Commenting on tasks
 - File attachments
-- Task sharing among users
 
 ### 🔔 Notifications
 
@@ -46,8 +43,6 @@ The **Todo App Backend** is a comprehensive Spring Boot application that serves 
 - CORS configuration
 - Role-based authorization
 - Secure password reset flow
-
----
 
 ## 🧱 Architecture
 
@@ -77,8 +72,6 @@ Follows a layered architecture:
 
 - Request/response models
 - Validation annotations
-
----
 
 ## ⚙️ Technologies & Dependencies
 
@@ -118,23 +111,40 @@ Follows a layered architecture:
 - Lombok
 - Apache Commons IO
 
----
-
 ## 📁 Package Structure
 
 ```
 com.todo.app/
 ├── config/                  # App configuration
+│   ├── CorsConfig.java
 │   ├── EmailConfig.java
+│   ├── FileStorageConfig.java
+│   ├── JacksonConfig.java
 │   ├── JwtConfig.java
 │   ├── SecurityConfig.java
 │   ├── SwaggerConfig.java
+│   ├── ThymeleafConfig.java
+│   ├── WebConfig.java
+│   └── WebSocketConfig.java
 ├── controller/              # API endpoints
+│   ├── AttachmentController.java
 │   ├── AuthController.java
+│   ├── CategoryController.java
+│   ├── CommentController.java
+│   ├── NotificationController.java
+│   ├── PasswordResetController.java
+│   ├── ProfileController.java
+│   ├── SettingsController.java
 │   ├── TaskController.java
+│   ├── TaskListController.java
+│   ├── TaskWebSocketController.java
+│   ├── TestController.java
+│   └── UserController.java
 ├── model/
-│   ├── entity/              # JPA entities
 │   ├── dto/                 # DTOs
+│   │   ├── request/         # Request DTOs
+│   │   └── response/        # Response DTOs
+│   ├── entity/              # JPA entities
 │   └── enums/               # Enums
 ├── repository/              # Data access
 ├── security/
@@ -149,8 +159,6 @@ com.todo.app/
 ├── mapper/                  # MapStruct mappers
 └── scheduler/               # Scheduled tasks
 ```
-
----
 
 ## 🛠️ Getting Started
 
@@ -185,13 +193,13 @@ spring.mail.username=your-email@gmail.com
 spring.mail.password=your-app-password
 ```
 
----
+## ▶️ Installation & Running
 
-## ▶️ Building and Running
+### Method 1: Traditional Setup
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/todo-backend.git
+git clone https://github.com/hrishabh20/todo-backend.git
 cd todo-backend
 
 # Build the project
@@ -201,14 +209,24 @@ mvn clean install
 mvn spring-boot:run
 ```
 
----
+### Method 2: Docker Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/hrishabh20/todo-backend.git
+cd todo-backend
+
+# Build Docker image
+docker build -t hrishabh20/todo-backend:latest .
+
+# Run Docker container
+docker run -p 4000:4000 hrishabh20/todo-backend:latest
+```
 
 ## 📘 API Documentation
 
 Access Swagger UI at:
 **[http://localhost:4000/swagger-ui/index.html](http://localhost:4000/swagger-ui/index.html)**
-
----
 
 ## 🔌 API Endpoints
 
@@ -270,8 +288,6 @@ Access Swagger UI at:
 - `PUT /api/notifications/{id}/read`
 - `PUT /api/notifications/read-all`
 
----
-
 ## 🔒 Security Considerations
 
 - JWT expires in 24 hours
@@ -281,10 +297,19 @@ Access Swagger UI at:
 - Secure file upload validation
 - Input validation on all endpoints
 
----
-
 ## 🔮 Future Enhancements
 
 - OAuth2 (Google, GitHub) integration
-- Real-time updates using WebSockets
+- Analytics dashboard
 
+## 👥 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📞 Contact
+
+Project Link: [https://github.com/hrishabh-16/TaskForge](https://github.com/hrishabh-16/TaskForge)
